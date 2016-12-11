@@ -193,7 +193,7 @@ Blockly.smash.scrub_ = function(block, code) {
     var comment = block.getCommentText();
     comment = Blockly.utils.wrap(comment, Blockly.smash.COMMENT_WRAP - 3);
     if (comment) {
-      commentCode += Blockly.smash.prefixLines(comment, '// ') + '\n';
+      commentCode += Blockly.smash.prefixLines(comment, '# ') + '\n';
     }
     // Collect comments for all value arguments.
     // Don't collect comments for nested statements.
@@ -203,7 +203,7 @@ Blockly.smash.scrub_ = function(block, code) {
         if (childBlock) {
           var comment = Blockly.smash.allNestedComments(childBlock);
           if (comment) {
-            commentCode += Blockly.smash.prefixLines(comment, '// ');
+            commentCode += Blockly.smash.prefixLines(comment, '# ');
           }
         }
       }

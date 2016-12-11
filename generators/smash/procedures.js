@@ -32,14 +32,14 @@ Blockly.smash['procedures_defreturn'] = function(block) {
   var returnValue = Blockly.smash.valueToCode(block, 'RETURN',
       Blockly.smash.ORDER_NONE) || '';
   if (returnValue) {
-    returnValue = '  return ' + returnValue + ';\n';
+    returnValue = '  echo ' + returnValue + ';\n';
   }
   var args = [];
   for (var i = 0; i < block.arguments_.length; i++) {
     args[i] = Blockly.smash.variableDB_.getName(block.arguments_[i],
         Blockly.Variables.NAME_TYPE);
   }
-  var code = 'function ' + funcName + '(' + args.join(', ') + ') {\n' +
+  var code = 'function ' + funcName + ' {\n' +
       globals + branch + returnValue + '}';
   code = Blockly.smash.scrub_(block, code);
   // Add % so as not to collide with helper functions in definitions list.
@@ -61,7 +61,7 @@ Blockly.smash['procedures_callreturn'] = function(block) {
     args[i] = Blockly.smash.valueToCode(block, 'ARG' + i,
         Blockly.smash.ORDER_COMMA) || 'null';
   }
-  var code = funcName + '(' + args.join(', ') + ')';
+  var code = '$(' + funcName + args.join(' ') + ')';
   return [code, Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
@@ -72,9 +72,9 @@ Blockly.smash['procedures_callnoreturn'] = function(block) {
   var args = [];
   for (var i = 0; i < block.arguments_.length; i++) {
     args[i] = Blockly.smash.valueToCode(block, 'ARG' + i,
-        Blockly.smash.ORDER_COMMA) || 'null';
+        Blockly.smash.ORDER_COMMA) || '';
   }
-  var code = funcName + '(' + args.join(', ') + ');\n';
+  var code = funcName +  args.join(' ') + '\n';
   return code;
 };
 
@@ -82,14 +82,15 @@ Blockly.smash['procedures_ifreturn'] = function(block) {
   // Conditionally return value from a procedure.
   var condition = Blockly.smash.valueToCode(block, 'CONDITION',
       Blockly.smash.ORDER_NONE) || 'false';
-  var code = 'if (' + condition + ') {\n';
+  var code = 'if [ ' + condition + ' ]; then\n';
   if (block.hasReturnValue_) {
     var value = Blockly.smash.valueToCode(block, 'VALUE',
-        Blockly.smash.ORDER_NONE) || 'null';
-    code += '  return ' + value + ';\n';
+        Blockly.smash.ORDER_NONE) || '';
+    code += '  echo ' + value + '\n';
+    code += '  exit 0 \n';
   } else {
-    code += '  return;\n';
+    code += '  exit 0 \n';
   }
-  code += '}\n';
+  code += 'fi\n';
   return code;
 };
