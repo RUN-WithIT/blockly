@@ -27,42 +27,41 @@ Blockly.smash['controls_if'] = function(block) {
 
 Blockly.smash['logic_compare'] = function(block) {
     // Comparison operator.
-    var OPERATORS = {
-	'EQ': '-eq',
-	'NEQ': '-ne',
-	'LT': '-lt',
-	'LTE': '-le',
-	'GT': '-gt',
-	'GTE': '-ge'
-    };
-    var operator = OPERATORS[block.getFieldValue('OP')];
-    var order = (operator == '-eq' || operator == '-ne') ?
-    Blockly.smash.ORDER_EQUALITY : Blockly.smash.ORDER_RELATIONAL;
-    //    if (typeof argument0 == "string" && typeof argument1 == "string")
     var argument0 = Blockly.smash.valueToCode(block, 'A', order) || '0';
     var argument1 = Blockly.smash.valueToCode(block, 'B', order) || '0';
 
+    argument0 = isNaN(Number(argument0)) ? argument0 : Number(argument0);
+    argument1 = isNaN(Number(argument1)) ? argument1 : Number(argument1);
+
+    if ((typeof argument0 == "string" && argument0.charAt(0) != '$') ||
+     	(typeof argument1 == "string" && argument1.charAt(0) != '$'))
+     	{
+     	    var OPERATORS = {
+                'EQ': '==',
+                'NEQ': '!=',
+                'LT': '\<',
+                'LTE': '\<=',
+                'GT': '\>',
+                'GTE': '\>='
+     	    };
+        } else {
+
+            var OPERATORS = {
+                'EQ': '-eq',
+                'NEQ': '-ne',
+                'LT': '-lt',
+                'LTE': '-le',
+                'GT': '-gt',
+                'GTE': '-ge'
+            };
+    }
+    var operator = OPERATORS[block.getFieldValue('OP')];
+    var order = (operator == OPERATORS.EQ || operator == OPERATORS.NEQ) ?
+    Blockly.smash.ORDER_EQUALITY : Blockly.smash.ORDER_RELATIONAL;
+
+
     var code = argument0  + ' ' + operator + ' ' + argument1;
     return [code, order];
-
-    // if either argument is a non-variable string, then change operators
-    // and quote things
-//     if ((typeof(argument0) == "string" && argument0.charAt(0) != '$') ||
-// 	(typeof(argument1) == "string" && argument1.charAt(0) != '$'))
-// 	{
-// 	    var OPERATORS = {
-// 		'EQ': '==',
-// 		'NEQ': '!=',
-// 		'LT': '\<',
-// 		'LTE': '\<=',
-// 		'GT': '\>',
-// 		'GTE': '\>='
-// 	    };
-// 	    var operator = OPERATORS[block.getFieldValue('OP')];
-	    
-// 	    var code = '"' + argument0 + '"' + ' ' + operator + ' ' + '"' + argument1 + '"';
-// 	    return [code, order];
-// 	}
 
 };
 
@@ -119,6 +118,6 @@ Blockly.smash['logic_ternary'] = function(block) {
       Blockly.smash.ORDER_CONDITIONAL) || '""';
   var value_else = Blockly.smash.valueToCode(block, 'ELSE',
       Blockly.smash.ORDER_CONDITIONAL) || '""';
-  var code = value_if + ' ? ' + value_then + ' : ' + value_else;
+  var code = '$([ ' + value_if + ' ] && echo ' + value_then + ' || echo ' + value_else + ')';
   return [code, Blockly.smash.ORDER_CONDITIONAL];
 };
