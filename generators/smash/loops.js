@@ -26,10 +26,10 @@ Blockly.smash['controls_repeat_ext'] = function(block) {
         'repeat_end', Blockly.Variables.NAME_TYPE);
     code += endVar + ' = ' + repeats + ';\n';
   }
-  code += 'for (' + loopVar + ' = 0; ' +
-      loopVar + ' < ' + endVar + '; ' +
-      loopVar + '++) {\n' +
-      branch + '}\n';
+  code += 'for ((' + loopVar + '=0; ' +
+      loopVar + '<' + endVar + '; ' +
+      loopVar + '++)) ; do\n' +
+      branch + 'done\n';
   return code;
 };
 
@@ -66,16 +66,16 @@ Blockly.smash['controls_for'] = function(block) {
       Blockly.isNumber(increment)) {
     // All arguments are simple numbers.
     var up = parseFloat(argument0) <= parseFloat(argument1);
-    code = 'for (' + variable0 + ' = ' + argument0 + '; ' +
-        variable0 + (up ? ' <= ' : ' >= ') + argument1 + '; ' +
+    code = 'for ((' + variable0 + '=' + argument0 + '; ' +
+        variable0 + (up ? '<=' : '>=') + argument1 + '; ' +
         variable0;
     var step = Math.abs(parseFloat(increment));
     if (step == 1) {
       code += up ? '++' : '--';
     } else {
-      code += (up ? ' += ' : ' -= ') + step;
+      code += (up ? '+=' : '-=') + step;
     }
-    code += ') {\n' + branch + '}\n';
+    code += ')) ; do\n' + branch + 'done\n';
   } else {
     code = '';
     // Cache non-trivial values to variables to prevent repeated look-ups.
@@ -83,33 +83,33 @@ Blockly.smash['controls_for'] = function(block) {
     if (!argument0.match(/^\w+$/) && !Blockly.isNumber(argument0)) {
       startVar = Blockly.smash.variableDB_.getDistinctName(
           variable0 + '_start', Blockly.Variables.NAME_TYPE);
-      code += startVar + ' = ' + argument0 + ';\n';
+      code += startVar + '=' + argument0 + ';\n';
     }
     var endVar = argument1;
     if (!argument1.match(/^\w+$/) && !Blockly.isNumber(argument1)) {
-      var endVar = Blockly.smash.variableDB_.getDistinctName(
+      var endVar = "$" + Blockly.smash.variableDB_.getDistinctName(
           variable0 + '_end', Blockly.Variables.NAME_TYPE);
-      code += endVar + ' = ' + argument1 + ';\n';
+      code += endVar + '=' + argument1 + '\n';
     }
     // Determine loop direction at start, in case one of the bounds
     // changes during loop execution.
     var incVar = Blockly.smash.variableDB_.getDistinctName(
         variable0 + '_inc', Blockly.Variables.NAME_TYPE);
-    code += incVar + ' = ';
+    code += incVar + '=';
     if (Blockly.isNumber(increment)) {
       code += Math.abs(increment) + ';\n';
     } else {
       code += 'abs(' + increment + ');\n';
     }
-    code += 'if (' + startVar + ' > ' + endVar + ') {\n';
-    code += Blockly.smash.INDENT + incVar + ' = -' + incVar + ';\n';
-    code += '}\n';
-    code += 'for (' + variable0 + ' = ' + startVar + '; ' +
-        incVar + ' >= 0 ? ' +
-        variable0 + ' <= ' + endVar + ' : ' +
-        variable0 + ' >= ' + endVar + '; ' +
-        variable0 + ' += ' + incVar + ') {\n' +
-        branch + '}\n';
+    code += 'if [ $' + startVar + ' -gt ' + endVar + ' ]; then\n';
+    code += Blockly.smash.INDENT + incVar + '=-$' + incVar + '\n';
+    code += 'fi\n';
+    code += 'for ((' + variable0 + '=$' + startVar + '; ' +
+        '$([ $' + incVar + ' -gt 0 ] && ' +
+        'echo $((' + variable0 + '<=' + endVar + ')) || ' +
+        'echo $((' + variable0 + '>=' + endVar + ')) ); ' +
+        variable0 + ' += ' + incVar + ')); do\n' +
+        branch + 'done\n';
   }
   return code;
 };
@@ -119,12 +119,18 @@ Blockly.smash['controls_forEach'] = function(block) {
   var variable0 = Blockly.smash.variableDB_.getName(
       block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
   var argument0 = Blockly.smash.valueToCode(block, 'LIST',
-      Blockly.smash.ORDER_ASSIGNMENT) || '[]';
+      Blockly.smash.ORDER_ASSIGNMENT) || '()';
   var branch = Blockly.smash.statementToCode(block, 'DO');
   branch = Blockly.smash.addLoopTrap(branch, block.id);
   var code = '';
-  code += 'foreach (' + argument0 + ' as ' + variable0 +
-      ') {\n' + branch + '}\n';
+  if (argument0.indexOf("(") == 0){
+        argument0 = argument0.slice(1,-1)
+  } else {
+        argument0 = "${" + argument0.slice(1) + "[@]}";
+  }
+
+  code += 'for ' + variable0 + ' in ' + argument0 +
+      '; do\n' + branch + 'done\n';
   return code;
 };
 
@@ -132,9 +138,9 @@ Blockly.smash['controls_flow_statements'] = function(block) {
   // Flow statements: continue, break.
   switch (block.getFieldValue('FLOW')) {
     case 'BREAK':
-      return 'break;\n';
+      return 'break\n';
     case 'CONTINUE':
-      return 'continue;\n';
+      return 'continue\n';
   }
   throw 'Unknown flow statement.';
 };
