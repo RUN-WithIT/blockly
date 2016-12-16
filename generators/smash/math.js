@@ -121,11 +121,11 @@ Blockly.smash['math_single'] = function(block) {
 Blockly.smash['math_constant'] = function(block) {
   // Constants: PI, E, the Golden Ratio, sqrt(2), 1/sqrt(2), INFINITY.
   var CONSTANTS = {
-    'PI': ['M_PI', Blockly.smash.ORDER_ATOMIC],
-    'E': ['M_E', Blockly.smash.ORDER_ATOMIC],
-    'GOLDEN_RATIO': ['(1 + sqrt(5)) / 2', Blockly.smash.ORDER_DIVISION],
-    'SQRT2': ['M_SQRT2', Blockly.smash.ORDER_ATOMIC],
-    'SQRT1_2': ['M_SQRT1_2', Blockly.smash.ORDER_ATOMIC],
+    'PI': ['`echo "scale=5; 4*a(1)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
+    'E': ['`echo "scale=5; e(1)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
+    'GOLDEN_RATIO': ['`echo "scale=5; (1 + sqrt(5)) / 2" | bc -l`', Blockly.smash.ORDER_DIVISION],
+    'SQRT2': ['`echo "scale=5; sqrt(2)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
+    'SQRT1_2': ['`echo "scale=5; 1/sqrt(2)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
     'INFINITY': ['INF', Blockly.smash.ORDER_ATOMIC]
   };
   return CONSTANTS[block.getFieldValue('CONSTANT')];
@@ -142,26 +142,31 @@ Blockly.smash['math_number_property'] = function(block) {
     // Prime is a special case as it is not a one-liner test.
     var functionName = Blockly.smash.provideFunction_(
         'math_isPrime',
-        ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + '($n) {',
+        ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + '{',
          '  // https://en.wikipedia.org/wiki/Primality_test#Naive_methods',
-         '  if ($n == 2 || $n == 3) {',
-         '    return true;',
-         '  }',
+         '  if [ "$1" -eq "2" ] ||[ "$1" -eq "3" ] ',
+	 '  then',
+         '    echo 1',
+	 '    exit 1',
+         '  fi',
          '  // False if n is NaN, negative, is 1, or not whole.',
          '  // And false if n is divisible by 2 or 3.',
-         '  if (!is_numeric($n) || $n <= 1 || $n % 1 != 0 || $n % 2 == 0 ||' +
-            ' $n % 3 == 0) {',
-         '    return false;',
-         '  }',
+         '  if [ "$1" =~ ^[0-9]+$ ] || [ "$1" -le "1" ] ||' +
+         '  [ "$1" % "1" -ne "0" ] || "$1" % "2" -eq "0" || "$1" % "3" -eq "0"]',
+	 '  then',
+         '    echo 0',
+	 '    exit 1',
+         '  fi',
          '  // Check all the numbers of form 6k +/- 1, up to sqrt(n).',
-         '  for ($x = 6; $x <= sqrt($n) + 1; $x += 6) {',
-         '    if ($n % ($x - 1) == 0 || $n % ($x + 1) == 0) {',
-         '      return false;',
-         '    }',
-         '  }',
-         '  return true;',
+         '  for (($x=6; "$x"<=`echo "sqrt($1)" | bc -q` + 1; $x+=6)); do',
+         '    if [ $1 % ($x - 1) -eq  0 ] || [ $1 % ($x + 1) -eq 0 ]; then',
+         '      echo 0',
+	 '      exit 1',
+         '    fi',
+         '  done',
+         '  echo 0',
          '}']);
-    code = functionName + '(' + number_to_check + ')';
+    code = functionName + number_to_check;
     return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
   }
   switch (dropdown_property) {
