@@ -276,3 +276,19 @@ Blockly.smash.getAdjusted = function(block, atId, opt_delta, opt_negate,
   }
   return at;
 };
+
+/**
+ * Remove dollar sign ($) from variable.
+ * @param {sting} variable name.
+ * @return {string}
+ */
+Blockly.smash.strip$ = function(variable) {
+    if (typeof variable != "string") {
+        return variable;
+    }
+
+    if (-1 < variable.indexOf('$')){
+        variable = variable.slice(1);
+    }
+    return variable;
+};
