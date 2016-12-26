@@ -32,29 +32,41 @@ Blockly.smash['logic_compare'] = function(block) {
 
     argument0 = isNaN(Number(argument0)) ? argument0 : Number(argument0);
     argument1 = isNaN(Number(argument1)) ? argument1 : Number(argument1);
-
-    if ((typeof argument0 == "string" && argument0.charAt(0) != '$') ||
-     	(typeof argument1 == "string" && argument1.charAt(0) != '$'))
-     	{
+    //if both args are variables
+    if ((typeof argument0 == "string" && argument0.charAt(0) == '$') &&
+        (typeof argument1 == "string" && argument1.charAt(0) == '$')) {
+            var OPERATORS = {
+                            'EQ': '==',
+                            'NEQ': '!=',
+                            'LT': '-lt',
+                            'LTE': '-le',
+                            'GT': '-gt',
+                            'GTE': '-ge'
+                        };
+    //if comparing to a string
+    } else if ((typeof argument0 == "string" && argument0.charAt(0) != '$') ||
+     	(typeof argument1 == "string" && argument1.charAt(0) != '$')) {
      	    var OPERATORS = {
                 'EQ': '==',
                 'NEQ': '!=',
-                'LT': '\<',
-                'LTE': '\<=',
-                'GT': '\>',
-                'GTE': '\>='
+                'LT': '\\<',
+                'LTE': '\\<=',
+                'GT': '\\>',
+                'GTE': '\\>='
      	    };
-        } else {
+    //if comparing to a number
+    } else if (!isNaN(argument0) || !isNaN(argument1)) {
 
-            var OPERATORS = {
-                'EQ': '-eq',
-                'NEQ': '-ne',
-                'LT': '-lt',
-                'LTE': '-le',
-                'GT': '-gt',
-                'GTE': '-ge'
-            };
+        var OPERATORS = {
+            'EQ': '-eq',
+            'NEQ': '-ne',
+            'LT': '-lt',
+            'LTE': '-le',
+            'GT': '-gt',
+            'GTE': '-ge'
+        };
     }
+
     var operator = OPERATORS[block.getFieldValue('OP')];
     var order = (operator == OPERATORS.EQ || operator == OPERATORS.NEQ) ?
     Blockly.smash.ORDER_EQUALITY : Blockly.smash.ORDER_RELATIONAL;
