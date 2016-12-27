@@ -8,6 +8,9 @@ goog.require('Blockly.smash');
 Blockly.smash['text'] = function(block) {
   // Text value.
   var code = Blockly.smash.quote_(block.getFieldValue('TEXT'));
+  code = code.replace("!", "\\!")
+  code = code.replace("$", "\\$")
+  code = code.replace("#", "\\#")
   return [code, Blockly.smash.ORDER_ATOMIC];
 };
 
