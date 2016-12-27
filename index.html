@@ -10,12 +10,14 @@
   <script src="dart_compressed.js"></script>
   <script src="smash_compressed.js"></script>
   <script src="demos/prettify.js"></script>
+  <script src="appengine/storage.js"></script>
   <script src="demos/interpreter/acorn_interpreter.js"></script>
   <link href="demos/prettify.css" rel="stylesheet">
   <link href="styles/blockly-demo.css" rel="stylesheet">
 </head>
 <body>
 <div class="app-container">
+
   <div id="blocklyDiv" class="main blockly-panel"></div>
   <div id="codeDiv" class="main output-panel">
     <div class="dropdown-bar">
@@ -35,6 +37,7 @@
     <pre></pre>
   </div>
   <div id="playButton" class="play-button material-icons">play_arrow</div>
+  <div onclick="save()" class="save-button material-icons">save</div>
 </div>
 <xml id="toolbox" style="display: none">
     <category id="catLogic" colour="210" name="Logic">
@@ -439,7 +442,25 @@
       throw EvalError('Infinite loop.');
     }
   }
-  
+
   document.getElementById('playButton').addEventListener('click', executeBlockCode);
+
+
+  function save() {
+    if ('localStorage' in window) {
+      var workspace = Blockly.getMainWorkspace();
+      var xml = Blockly.Xml.workspaceToDom(workspace);
+      // Gets the current URL, not including the hash.
+      window.localStorage.setItem('blockly', Blockly.Xml.domToText(xml));
+      console.log("saved: ", new Date());
+    }
+  }
+
+  var workspace = Blockly.getMainWorkspace();
+  var xml = Blockly.Xml.textToDom(window.localStorage['blockly']);
+  if (xml) {
+    workspace.clear();
+    Blockly.Xml.domToWorkspace(xml, workspace);
+  }
 </script>
 </body>

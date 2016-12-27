@@ -82,7 +82,27 @@
   box-shadow: 0 2px 2px rgba(0,0,0,.2),0 6px 10px rgba(0,0,0,.3);
   transition: box-shadow .3s ease-in-out;
 }
+.save-button {
+  position: absolute;
+  bottom: 24px;
+  right: 90px;
+  border-radius: 100%;
+  color: white;
+  width: 56px;
+  height: 56px;
+  line-height: 56px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.37);
+  transition: box-shadow .3s ease-in-out;
+  text-align: center;
+  font-weight: 500;
+  background-color: #ec9d0b;
+  cursor: pointer;
+}
 
+.save-button:hover {
+  box-shadow: 0 2px 2px rgba(0,0,0,.2),0 6px 10px rgba(0,0,0,.3);
+  transition: box-shadow .3s ease-in-out;
+}
 .but-not-that-pretty {
   border: 0 !important;
   margin: 0 !important;
