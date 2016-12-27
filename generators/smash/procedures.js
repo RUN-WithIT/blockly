@@ -6,16 +6,6 @@ goog.require('Blockly.smash');
 
 Blockly.smash['procedures_defreturn'] = function(block) {
   // Define a procedure with a return value.
-  // First, add a 'global' statement for every variable that is not shadowed by
-  // a local parameter.
-  var globals = [];
-  for (var i = 0, varName; varName = block.workspace.variableList[i]; i++) {
-    if (block.arguments_.indexOf(varName) == -1) {
-      globals.push(Blockly.smash.variableDB_.getName(varName,
-          Blockly.Variables.NAME_TYPE));
-    }
-  }
-  globals = globals.length ? '  global ' + globals.join(', ') + ';\n' : '';
 
   var funcName = Blockly.smash.variableDB_.getName(
       block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
@@ -40,7 +30,7 @@ Blockly.smash['procedures_defreturn'] = function(block) {
         Blockly.Variables.NAME_TYPE);
   }
   var code = 'function ' + funcName + ' {\n' +
-      globals + branch + returnValue + '}';
+      branch + returnValue + '}';
   code = Blockly.smash.scrub_(block, code);
   // Add % so as not to collide with helper functions in definitions list.
   Blockly.smash.definitions_['%' + funcName] = code;
