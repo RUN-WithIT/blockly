@@ -26,7 +26,7 @@ Blockly.smash['lists_create_with'] = function(block) {
   var code = new Array(block.itemCount_);
   for (var i = 0; i < block.itemCount_; i++) {
     code[i] = Blockly.smash.valueToCode(block, 'ADD' + i,
-        Blockly.smash.ORDER_COMMA) || 'null';
+        Blockly.smash.ORDER_COMMA) || '';
   }
   code = '(' + code.join(' ') + ')';
   return [code, Blockly.smash.ORDER_FUNCTION_CALL];
@@ -39,9 +39,9 @@ Blockly.smash['lists_repeat'] = function(block) {
       ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
        '  array=();',
        '  for ((i=0; i<$2; i++)) ; do',
-       '    array=(${array[@]} $1)',
+       '    array=("${array[@]}" $1)',
        '  done',
-       '  echo ${array[@]}',
+       '  echo "${array[@]}"',
        '}']);
   var element = Blockly.smash.valueToCode(block, 'ITEM',
       Blockly.smash.ORDER_COMMA) || 'null';
@@ -56,7 +56,7 @@ Blockly.smash['lists_length'] = function(block) {
   var list = Blockly.smash.valueToCode(block, 'VALUE',
       Blockly.smash.ORDER_NONE) || '\'\'';
   list = Blockly.smash.strip$(list);
-  return ['${#' + list + '[@]}', Blockly.smash.ORDER_FUNCTION_CALL];
+  return ['"${#' + list + '[@]}"', Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
 Blockly.smash['lists_isEmpty'] = function(block) {
@@ -66,7 +66,7 @@ Blockly.smash['lists_isEmpty'] = function(block) {
 
   argument0 = Blockly.smash.strip$(argument0);
 
-  return ['$([ ${#' + argument0 + '[@]} -eq 0 ])', Blockly.smash.ORDER_FUNCTION_CALL];
+  return ['$([ "${#' + argument0 + '[@]}" -eq 0 ])', Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
 Blockly.smash['lists_indexOf'] = function(block) {
@@ -89,7 +89,7 @@ Blockly.smash['lists_indexOf'] = function(block) {
         ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
          '  local haystack=("${!1}")',
          '  local needle=${2}',
-         '  for i in ${!haystack[@]}; do',
+         '  for i in "${!haystack[@]}"; do',
          '    if [ "${haystack[$i]}" = "${needle}" ]; then',
          '      echo $((i' + indexAdjustment + '))',
          '      exit 0',
@@ -103,9 +103,9 @@ Blockly.smash['lists_indexOf'] = function(block) {
         'lastIndexOf',
         ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
          '  local haystack=("${!1}")',
-         '  local needle=${2}',
+         '  local needle="${2}"',
          '  last=' + errorIndex,
-         '  for i in ${!haystack[@]}; do',
+         '  for i in "${!haystack[@]}"; do',
          '    if [ "${haystack[$i]}" = "${needle}" ]; then',
          '      last=$((i' + indexAdjustment + '))',
          '    fi',
@@ -128,20 +128,20 @@ Blockly.smash['lists_getIndex'] = function(block) {
         var list = Blockly.smash.valueToCode(block, 'VALUE',
                 Blockly.smash.ORDER_MEMBER) || '()';
         list = Blockly.smash.strip$(list);
-        var code = '${' + list + '[0]}';
+        var code = '"${' + list + '[0]}"';
         return [code, Blockly.smash.ORDER_MEMBER];
       } else if (mode == 'GET_REMOVE') {
         var list = Blockly.smash.valueToCode(block, 'VALUE',
                 Blockly.smash.ORDER_NONE) || '()';
         list = Blockly.smash.strip$(list);
-        var code = '${'+list + '[0]}; ' +
-                list + '=(${' + list + '[@]:1})';
+        var code = '"${'+list + '[0]};" ' +
+                list + '=("${' + list + '[@]:1}")';
         return [code, Blockly.smash.ORDER_FUNCTION_CALL];
       } else if (mode == 'REMOVE') {
         var list = Blockly.smash.valueToCode(block, 'VALUE',
                 Blockly.smash.ORDER_NONE) || '()';
         list = Blockly.smash.strip$(list);
-        return list +'=(${' + list + '[@]:1})\n';
+        return list +'=("${' + list + '[@]:1}")\n';
       }
       break;
     case 'LAST':
@@ -149,21 +149,21 @@ Blockly.smash['lists_getIndex'] = function(block) {
         var list = Blockly.smash.valueToCode(block, 'VALUE',
                 Blockly.smash.ORDER_NONE) || '()';
         list = Blockly.smash.strip$(list);
-        var code = '${' + list + '[${#' + list + '[@]}-1]}';
+        var code = '"${' + list + '[\\"${#' + list + '[@]\\"}-1]}"';
         return [code, Blockly.smash.ORDER_FUNCTION_CALL];
       } else if (mode == 'GET_REMOVE') {
         var list = Blockly.smash.valueToCode(block, 'VALUE',
                 Blockly.smash.ORDER_NONE) || '()';
         list = Blockly.smash.strip$(list);
-        var code =  '${' + list + '[${#' + list + '[@]}-1]}; ' +
-                'unset ' + list + '[${#' + list + '[@]}-1]}; ' +
-                list + '=(${' + list + '[@]:1})';
+        var code =  '"${' + list + '[\\"${#' + list + '[@]}\\"-1]}"; ' +
+                'unset ' + list + '[\\"${#' + list + '[@]}\\"-1]}\\"; ' +
+                list + '=("${' + list + '[@]:1}")';
         return [code, Blockly.smash.ORDER_FUNCTION_CALL];
       } else if (mode == 'REMOVE') {
         var list = Blockly.smash.valueToCode(block, 'VALUE',
                 Blockly.smash.ORDER_NONE) || '()';
         list = Blockly.smash.strip$(list);
-        return  'unset ' + list + '[${#' + list + '[@]}-1]}';
+        return  'unset ' + list + '["${#' + list + '[@]}"-1]';
       }
       break;
     case 'FROM_START':
@@ -172,20 +172,20 @@ Blockly.smash['lists_getIndex'] = function(block) {
         var list = Blockly.smash.valueToCode(block, 'VALUE',
                 Blockly.smash.ORDER_MEMBER) || '()';
         list = Blockly.smash.strip$(list);
-        var code = '${' + list + '[' + at + ']}';
+        var code = '"${' + list + '[' + at + ']}"';
         return [code, Blockly.smash.ORDER_MEMBER];
       } else if (mode == 'GET_REMOVE') {
         var list = Blockly.smash.valueToCode(block, 'VALUE',
-                Blockly.smash.ORDER_COMMA) || 'array()';
+                Blockly.smash.ORDER_COMMA) || '()';
         list = Blockly.smash.strip$(list);
-        var code = '${' + list + '[' + at + ']};' +
-            ' unset ' + list + '[' + at + ']; ' + list + '=(${' + list + '[@]})';
+        var code = '"${' + list + '[' + at + ']}";' +
+            ' unset ' + list + '[' + at + ']; ' + list + '=("${' + list + '[@]}")';
         return [code, Blockly.smash.ORDER_FUNCTION_CALL];
       } else if (mode == 'REMOVE') {
         var list = Blockly.smash.valueToCode(block, 'VALUE',
                 Blockly.smash.ORDER_COMMA) || 'array()';
         list = Blockly.smash.strip$(list);
-        return 'unset ' + list + '[' + at + ']; ' + list + '=(${' + list + '[@]})\n';
+        return 'unset ' + list + '[' + at + ']; ' + list + '=("${' + list + '[@]}")\n';
       }
       break;
     case 'FROM_END':
@@ -194,7 +194,7 @@ Blockly.smash['lists_getIndex'] = function(block) {
                 Blockly.smash.ORDER_COMMA) || '()';
         var at = Blockly.smash.getAdjusted(block, 'AT', 1, true);
         list = Blockly.smash.strip$(list);
-        var code = '${' + list + '[${#' + list + '[@]}' + at + ']}';
+        var code = '"${' + list + '[\\"${#' + list + '[@]}"' + at + ']}"';
         return [code, Blockly.smash.ORDER_FUNCTION_CALL];
       } else if (mode == 'GET_REMOVE' || mode == 'REMOVE') {
         var list = Blockly.smash.valueToCode(block, 'VALUE',
@@ -202,9 +202,9 @@ Blockly.smash['lists_getIndex'] = function(block) {
         var at = Blockly.smash.getAdjusted(block, 'AT', 1, false,
             Blockly.smash.ORDER_SUBTRACTION);
         list = Blockly.smash.strip$(list);
-       var code =  '${' + list + '[${#' + list + '[@]}-' + at +']}; ' +
-                       'unset ' + list + '[${#' + list + '[@]}' + at + ']; ' +
-                       list + '=(${' + list + '[@]})\n';
+       var code =  '"${' + list + '[\\"${#' + list + '[@]}\\"-' + at +']}"; ' +
+                       'unset ' + list + '["${#' + list + '[@]}"' + at + ']; ' +
+                       list + '=("${' + list + '[@]}")\n';
         if (mode == 'GET_REMOVE') {
           return [code, Blockly.smash.ORDER_FUNCTION_CALL];
         } else if (mode == 'REMOVE') {
@@ -220,11 +220,11 @@ Blockly.smash['lists_getIndex'] = function(block) {
         var functionName = Blockly.smash.provideFunction_(
             'lists_get_random_item',
             ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
-             '  local _name=$1[@]',
+             '  local _name="$1[@]"',
              '  local _l=("${!_name}")',
-             '  local i=$(($RANDOM % ${#_l[@]}))',
-             '  echo ${_l[$i]}',
-             '  eval "$1=(\\${_l[@]})"',
+             '  local i=$(($RANDOM % "${#_l[@]}"))',
+             '  echo "${_l[$i]}"',
+             '  eval "$1=(\\"\\${_l[@]}\\")"',
              '}']);
         code = '$(' + functionName + ' ' + list + ')';
         return [code, Blockly.smash.ORDER_FUNCTION_CALL];
@@ -232,12 +232,12 @@ Blockly.smash['lists_getIndex'] = function(block) {
         var functionName = Blockly.smash.provideFunction_(
             'lists_get_remove_random_item',
             ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
-             '  local _name=$1[@]',
+             '  local _name="$1[@]"',
              '  local _l=("${!_name}")',
-             '  local i=$(($RANDOM % ${#_l[@]}))',
-             '  echo ${_l[$i]}',
+             '  local i=$(($RANDOM % "${#_l[@]}"))',
+             '  echo "${_l[$i]}"',
              '  unset _l[$i]',
-             '  eval "$1=(\\${_l[@]})"',
+             '  eval "$1=(\\"\\${_l[@]}\\")"',
              '}']);
         code = '$(' + functionName + ' ' + list + ')';
         return [code, Blockly.smash.ORDER_FUNCTION_CALL];
@@ -247,9 +247,9 @@ Blockly.smash['lists_getIndex'] = function(block) {
             ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
              '  local _name=$1[@]',
              '  local _l=("${!_name}")',
-             '  local i=$(($RANDOM % ${#_l[@]}))',
+             '  local i=$(($RANDOM % "${#_l[@]}"))',
              '  unset _l[$i] ',
-             '  eval "$1=(\\${_l[@]})"',
+             '  eval "$1=(\\"\\${_l[@]}\\")"',
              '}']);
         return '$(' + functionName + ' ' + list + ')\n';
       }
@@ -275,7 +275,7 @@ Blockly.smash['lists_setIndex'] = function(block) {
         return list + '[0]=' + value + '\n';
       } else if (mode == 'INSERT') {
         list = Blockly.smash.strip$(list);
-        return  list + '=(' + value + ' ${' + list + '[@]})\n';
+        return  list + '=(' + value + ' "${' + list + '[@]}")\n';
       }
       break;
     case 'LAST':
@@ -283,9 +283,9 @@ Blockly.smash['lists_setIndex'] = function(block) {
               Blockly.smash.ORDER_COMMA) || '()';
       list = Blockly.smash.strip$(list);
       if (mode == 'SET') {
-        return list + '[${#' + list + '[@]} - 1]=' + value + '\n';
+        return list + '["${#' + list + '[@]}" - 1]=' + value + '\n';
       } else if (mode == 'INSERT') {
-        return  list + '=(${' + list + '[@]} ' + value + ')\n';
+        return  list + '=("${' + list + '[@]}" ' + value + ')\n';
       }
       break;
     case 'FROM_START':
@@ -296,7 +296,7 @@ Blockly.smash['lists_setIndex'] = function(block) {
       if (mode == 'SET') {
         return list + '[' + at + ']=' + value + '\n';
       } else if (mode == 'INSERT') {
-       return  list + '=(${' + list + '[@]:0:' + at + '} ' + value + ' ${' + list + '[@]:' + at + ':${#' + list + '[@]}}' + ')\n';
+       return  list + '=("${' + list + '[@]:0:' + at + '}" ' + value + ' "${' + list + '[@]:' + at + ':\\"${#' + list + '[@]}\\"}"' + ')\n';
       }
       break;
     case 'FROM_END':
@@ -305,11 +305,11 @@ Blockly.smash['lists_setIndex'] = function(block) {
       list = Blockly.smash.strip$(list);
       var at = Blockly.smash.getAdjusted(block, 'AT', 1);
       if (mode == 'SET') {
-        return list + '[${#' + list + '[@]} - ' + at + ']=' + value + '\n';
+        return list + '["${#' + list + '[@]}" - ' + at + ']=' + value + '\n';
       } else if (mode == 'INSERT') {
-        return  list + '=(${' + list + '[@]:0:${#' + list + '[@]} - ' + at + '} ' +
+        return  list + '=("${' + list + '[@]:0:\\"${#' + list + '[@]}\\" - ' + at + '}" ' +
             value +
-            ' ${' + list + '[@]:${#' + list + '[@]} -' + at + ':${#' + list + '[@]}}' +')\n';
+            ' "${' + list + '[@]:\\"${#' + list + '[@]}\\" -' + at + ':\\"${#' + list + '[@]}\\"}")\n';
       }
       break;
     case 'RANDOM':
@@ -317,18 +317,18 @@ Blockly.smash['lists_setIndex'] = function(block) {
               Blockly.smash.ORDER_REFERENCE) || '()';
       list = Blockly.smash.strip$(list);
       if (mode == 'SET') {
-        return list + '[$(($RANDOM % ${#' + list + '[@]}))]=' + value + '\n';
+        return list + '[$(($RANDOM % "${#' + list + '[@]}"))]=' + value + '\n';
       } else if (mode == 'INSERT') {
        var functionName = Blockly.smash.provideFunction_(
             'lists_insert_random_item',
             ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
-             '  local _name=$1[@]',
+             '  local _name="$1[@]"',
              '  local _l=("${!_name}")',
              '  local value=$2',
-             '  local i=$(($RANDOM % ${#_l[@]}))',
-             '  _l=(${_l[@]:0:$i} $value ${_l[@]:$i:${#' + list + '[@]}})\n',
-             '  echo ${_l[@]}',
-             '  eval "$1=(\\${_l[@]})"',
+             '  local i=$(($RANDOM % "${#_l[@]}"))',
+             '  _l=("${_l[@]:0:$i}" $value "${_l[@]:$i:\\"${#' + list + '[@]}\\"}")\n',
+             '  echo "${_l[@]}"',
+             '  eval "$1=(\\"\\${_l[@]}\\")"',
              '}']);
         return list + '=($(' + functionName + ' ' +list +' ' + value + '))'
       }
@@ -349,7 +349,7 @@ Blockly.smash['lists_getSublist'] = function(block) {
        break;
      case 'FROM_END':
        var at1 = Blockly.smash.getAdjusted(block, 'AT1', 1, true);
-       at1 = '${#' +list + '} ' + at1;
+       at1 = '"${#' +list + '}" ' + at1;
        break;
      case 'FIRST':
        var at1 = 0;
@@ -363,14 +363,14 @@ Blockly.smash['lists_getSublist'] = function(block) {
        break;
      case 'FROM_END':
        var at2 = Blockly.smash.getAdjusted(block, 'AT2', 0, true);
-       at2 = '${#' +list + '} ' + at2;
+       at2 = '"${#' +list + '}" ' + at2;
      case 'LAST':
-       var at2 = '${#' +list + '}';
+       var at2 = '"${#' +list + '}"';
        break;
      default:
        throw 'Unhandled option (lists_getSublist)';
    }
-   var code = '(${' + list + '[@]:' + at1 + ' : ' + at2 + '})';
+   var code = '("${' + list + '[@]:' + at1 + ' : ' + at2 + '}")';
    return [code, Blockly.smash.ORDER_MEMBER];
 };
 
@@ -393,7 +393,7 @@ Blockly.smash['lists_sort'] = function(block) {
     args += '-f '
   }
 
-  var sortCode = '$(echo ${' + list + '[@]} | tr " " "\\n" | sort ' + args + ' | tr "\\n" " ")'
+  var sortCode = '$(echo "${' + list + '[@]}" | tr " " "\\n" | sort ' + args + ' | tr "\\n" " ")'
   return [sortCode, Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
@@ -410,7 +410,7 @@ Blockly.smash['lists_split'] = function(block) {
       value_input = '\'\'';
     }
 
-    var code = '(${' + value_input + '//' + value_delim + '/ })'
+    var code = '("${' + value_input + '//' + value_delim + '/ }")'
     return [code, Blockly.smash.ORDER_FUNCTION_CALL];
   } else if (mode == 'JOIN') {
     if (!value_input) {

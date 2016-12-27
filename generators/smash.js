@@ -287,8 +287,8 @@ Blockly.smash.strip$ = function(variable) {
         return variable;
     }
 
-    if (-1 < variable.indexOf('$')){
-        variable = variable.slice(1);
+    if (-1 < variable.indexOf('${')){
+        variable = variable.slice(2,-1);
     }
     return variable;
 };

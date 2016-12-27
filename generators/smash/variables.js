@@ -7,8 +7,8 @@ goog.require('Blockly.smash');
 
 Blockly.smash['variables_get'] = function(block) {
     // Variable getter.
-    var code = '$'+Blockly.smash.variableDB_.getName(block.getFieldValue('VAR'),
-        Blockly.Variables.NAME_TYPE);
+    var code = '${' + Blockly.smash.variableDB_.getName(block.getFieldValue('VAR'),
+        Blockly.Variables.NAME_TYPE)  + '}';
     return [code, Blockly.smash.ORDER_ATOMIC];
 };
 
