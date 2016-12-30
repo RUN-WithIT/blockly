@@ -17,26 +17,26 @@ Blockly.smash['text'] = function(block) {
 Blockly.smash['text_join'] = function(block) {
   // Create a string made up of any number of elements of any type.
   if (block.itemCount_ == 0) {
-    return ['\'\'', Blockly.smash.ORDER_ATOMIC];
+    return ['""', Blockly.smash.ORDER_ATOMIC];
   } else if (block.itemCount_ == 1) {
     var element = Blockly.smash.valueToCode(block, 'ADD0',
-        Blockly.smash.ORDER_NONE) || '\'\'';
+        Blockly.smash.ORDER_NONE) || '""';
     var code = element;
     return [code, Blockly.smash.ORDER_FUNCTION_CALL];
   } else if (block.itemCount_ == 2) {
     var element0 = Blockly.smash.valueToCode(block, 'ADD0',
-        Blockly.smash.ORDER_NONE) || '\'\'';
+        Blockly.smash.ORDER_NONE) || '""';
     var element1 = Blockly.smash.valueToCode(block, 'ADD1',
-        Blockly.smash.ORDER_NONE) || '\'\'';
-    var code = element0 + ' . ' + element1;
+        Blockly.smash.ORDER_NONE) || '""';
+    var code = '"'+ element0 + element1 + '"';
     return [code, Blockly.smash.ORDER_ADDITION];
   } else {
     var elements = new Array(block.itemCount_);
     for (var i = 0; i < block.itemCount_; i++) {
       elements[i] = Blockly.smash.valueToCode(block, 'ADD' + i,
-          Blockly.smash.ORDER_COMMA) || '\'\'';
+          Blockly.smash.ORDER_COMMA) || '""';
     }
-    var code = 'implode(\'\', array(' + elements.join(',') + '))';
+    var code = '"' + elements.join(" ") +'"';
     return [code, Blockly.smash.ORDER_FUNCTION_CALL];
   }
 };
@@ -47,30 +47,22 @@ Blockly.smash['text_append'] = function(block) {
       block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
   var value = Blockly.smash.valueToCode(block, 'TEXT',
       Blockly.smash.ORDER_ASSIGNMENT) || '\'\'';
-  return varName + ' .= ' + value + ';\n';
+  return varName + '="${' + varName + '}"' + value +'\n';
 };
 
 Blockly.smash['text_length'] = function(block) {
-  // String or array length.
-  var functionName = Blockly.smash.provideFunction_(
-      'length',
-      ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + '($value) {',
-       '  if (is_string($value)) {',
-       '    return strlen($value);',
-       '  } else {',
-       '    return count($value);',
-       '  }',
-       '}']);
   var text = Blockly.smash.valueToCode(block, 'VALUE',
       Blockly.smash.ORDER_NONE) || '\'\'';
-  return [functionName + '(' + text + ')', Blockly.smash.ORDER_FUNCTION_CALL];
+
+
+  return ['$(echo ' + text + ' | awk \'{print length}\')', Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
 Blockly.smash['text_isEmpty'] = function(block) {
   // Is the string null or array empty?
   var text = Blockly.smash.valueToCode(block, 'VALUE',
       Blockly.smash.ORDER_NONE) || '\'\'';
-  return ['empty(' + text + ')', Blockly.smash.ORDER_FUNCTION_CALL];
+  return ['$([[ !  -z  ' + text + ' ]] && echo 0 || echo 1)', Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
 Blockly.smash['text_indexOf'] = function(block) {

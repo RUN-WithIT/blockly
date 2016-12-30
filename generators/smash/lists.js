@@ -216,6 +216,7 @@ Blockly.smash['lists_getIndex'] = function(block) {
       }
       break;
     case 'RANDOM':
+    // TODO: fix scoping with arrays
       var list = Blockly.smash.valueToCode(block, 'VALUE',
               Blockly.smash.ORDER_NONE) || '()';
       list = Blockly.smash.strip$(list);
