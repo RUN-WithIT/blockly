@@ -51,7 +51,7 @@ Blockly.smash['procedures_callreturn'] = function(block) {
     args[i] = Blockly.smash.valueToCode(block, 'ARG' + i,
         Blockly.smash.ORDER_COMMA) || 'null';
   }
-  var code = '$(' + funcName + args.join(' ') + ')';
+  var code = '`' + funcName + args.join(' ') + '`';
   return [code, Blockly.smash.ORDER_FUNCTION_CALL];
 };
 

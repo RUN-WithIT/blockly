@@ -130,6 +130,6 @@ Blockly.smash['logic_ternary'] = function(block) {
       Blockly.smash.ORDER_CONDITIONAL) || '""';
   var value_else = Blockly.smash.valueToCode(block, 'ELSE',
       Blockly.smash.ORDER_CONDITIONAL) || '""';
-  var code = '$([ ' + value_if + ' ] && echo ' + value_then + ' || echo ' + value_else + ')';
+  var code = '`[ ' + value_if + ' ] && echo ' + value_then + ' || echo ' + value_else + '`';
   return [code, Blockly.smash.ORDER_CONDITIONAL];
 };

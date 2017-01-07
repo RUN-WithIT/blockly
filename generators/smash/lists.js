@@ -47,7 +47,7 @@ Blockly.smash['lists_repeat'] = function(block) {
       Blockly.smash.ORDER_COMMA) || 'null';
   var repeatCount = Blockly.smash.valueToCode(block, 'NUM',
       Blockly.smash.ORDER_COMMA) || '0';
-  var code = '($(' + functionName + ' ' + element + ' ' + repeatCount + '))';
+  var code = '(`' + functionName + ' ' + element + ' ' + repeatCount + '`)';
   return [code, Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
@@ -66,7 +66,7 @@ Blockly.smash['lists_isEmpty'] = function(block) {
 
   argument0 = Blockly.smash.strip$(argument0);
 
-  return ['$([ "${#' + argument0 + '[@]}" -eq 0 ])', Blockly.smash.ORDER_FUNCTION_CALL];
+  return ['`[ "${#' + argument0 + '[@]}" -eq 0 ]`', Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
 Blockly.smash['lists_indexOf'] = function(block) {
@@ -114,7 +114,7 @@ Blockly.smash['lists_indexOf'] = function(block) {
          '}']);
   }
   argument1 = Blockly.smash.strip$(argument1);
-  var code = '$(' + functionName + ' ' + argument1 + '[@] ' + argument0 + ')';
+  var code = '`' + functionName + ' ' + argument1 + '[@] ' + argument0 + '`';
   return [code, Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
@@ -216,7 +216,6 @@ Blockly.smash['lists_getIndex'] = function(block) {
       }
       break;
     case 'RANDOM':
-    // TODO: fix scoping with arrays
       var list = Blockly.smash.valueToCode(block, 'VALUE',
               Blockly.smash.ORDER_NONE) || '()';
       list = Blockly.smash.strip$(list);
@@ -230,7 +229,7 @@ Blockly.smash['lists_getIndex'] = function(block) {
              '  echo "${_l[$i]}"',
              '  eval "$1=(\\"\\${_l[@]}\\")"',
              '}']);
-        code = '$(' + functionName + ' ' + list + ')';
+        code = '`' + functionName + ' ' + list + '`';
         return [code, Blockly.smash.ORDER_FUNCTION_CALL];
       } else if (mode == 'GET_REMOVE') {
         var functionName = Blockly.smash.provideFunction_(
@@ -243,7 +242,7 @@ Blockly.smash['lists_getIndex'] = function(block) {
              '  unset _l[$i]',
              '  eval "$1=(\\"\\${_l[@]}\\")"',
              '}']);
-        code = '$(' + functionName + ' ' + list + ')';
+        code = '`' + functionName + ' ' + list + '`';
         return [code, Blockly.smash.ORDER_FUNCTION_CALL];
       } else if (mode == 'REMOVE') {
         var functionName = Blockly.smash.provideFunction_(
@@ -255,7 +254,7 @@ Blockly.smash['lists_getIndex'] = function(block) {
              '  unset _l[$i] ',
              '  eval "$1=(\\"\\${_l[@]}\\")"',
              '}']);
-        return '$(' + functionName + ' ' + list + ')\n';
+        return '`' + functionName + ' ' + list + '`\n';
       }
       break;
   }
@@ -334,7 +333,7 @@ Blockly.smash['lists_setIndex'] = function(block) {
              '  echo "${_l[@]}"',
              '  eval "$1=(\\"\\${_l[@]}\\")"',
              '}']);
-        return list + '=($(' + functionName + ' ' +list +' ' + value + '))\n'
+        return list + '=(`' + functionName + ' ' +list +' ' + value + '`)\n'
       }
       break;
   }
@@ -397,7 +396,7 @@ Blockly.smash['lists_sort'] = function(block) {
     args += '-f '
   }
 
-  var sortCode = '$(echo "${' + list + '[@]}" | tr " " "\\n" | sort ' + args + ' | tr "\\n" " ")'
+  var sortCode = '`echo "${' + list + '[@]}" | tr " " "\\n" | sort ' + args + ' | tr "\\n" " "`'
   return [sortCode, Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
@@ -421,7 +420,7 @@ Blockly.smash['lists_split'] = function(block) {
       value_input = '()';
     }
 
-    var code = '$(printf "%s" "${' + value_input + '[@]/#/' + value_delim + '}")'
+    var code = '`printf "%s" "${' + value_input + '[@]/#/' + value_delim + '}"`'
     return [code, Blockly.smash.ORDER_FUNCTION_CALL];
   } else {
     throw 'Unknown mode: ' + mode;

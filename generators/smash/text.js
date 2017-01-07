@@ -55,14 +55,14 @@ Blockly.smash['text_length'] = function(block) {
       Blockly.smash.ORDER_NONE) || '\'\'';
 
 
-  return ['$(echo ' + text + ' | awk \'{print length}\')', Blockly.smash.ORDER_FUNCTION_CALL];
+  return ['`echo ' + text + ' | awk \'{print length}\'`', Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
 Blockly.smash['text_isEmpty'] = function(block) {
   // Is the string null or array empty?
   var text = Blockly.smash.valueToCode(block, 'VALUE',
       Blockly.smash.ORDER_NONE) || '\'\'';
-  return ['$([[ !  -z  ' + text + ' ]] && echo 0 || echo 1)', Blockly.smash.ORDER_FUNCTION_CALL];
+  return ['`[[ !  -z  ' + text + ' ]] && echo 0 || echo 1`', Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
 Blockly.smash['text_indexOf'] = function(block) {
