@@ -36,7 +36,7 @@ Blockly.smash['text_join'] = function(block) {
       elements[i] = Blockly.smash.valueToCode(block, 'ADD' + i,
           Blockly.smash.ORDER_COMMA) || '""';
     }
-    var code = '"' + elements.join(" ") +'"';
+    var code = elements.join("");
     return [code, Blockly.smash.ORDER_FUNCTION_CALL];
   }
 };
@@ -46,13 +46,13 @@ Blockly.smash['text_append'] = function(block) {
   var varName = Blockly.smash.variableDB_.getName(
       block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
   var value = Blockly.smash.valueToCode(block, 'TEXT',
-      Blockly.smash.ORDER_ASSIGNMENT) || '\'\'';
+      Blockly.smash.ORDER_ASSIGNMENT) || '""';
   return varName + '="${' + varName + '}"' + value +'\n';
 };
 
 Blockly.smash['text_length'] = function(block) {
   var text = Blockly.smash.valueToCode(block, 'VALUE',
-      Blockly.smash.ORDER_NONE) || '\'\'';
+      Blockly.smash.ORDER_NONE) || '""';
 
 
   return ['`echo ' + text + ' | awk \'{print length}\'`', Blockly.smash.ORDER_FUNCTION_CALL];
@@ -61,7 +61,7 @@ Blockly.smash['text_length'] = function(block) {
 Blockly.smash['text_isEmpty'] = function(block) {
   // Is the string null or array empty?
   var text = Blockly.smash.valueToCode(block, 'VALUE',
-      Blockly.smash.ORDER_NONE) || '\'\'';
+      Blockly.smash.ORDER_NONE) || '""';
   return ['`[[ !  -z  ' + text + ' ]] && echo 0 || echo 1`', Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
@@ -171,11 +171,11 @@ Blockly.smash['text_changeCase'] = function(block) {
   var text = Blockly.smash.valueToCode(block, 'TEXT',
           Blockly.smash.ORDER_NONE) || '\'\'';
   if (block.getFieldValue('CASE') == 'UPPERCASE') {
-    var code = 'strtoupper(' + text + ')';
+    var code = '`echo ' + text + ' | tr \'[:lower:]\'  \'[:upper:]\'`';
   } else if (block.getFieldValue('CASE') == 'LOWERCASE') {
-    var code = 'strtolower(' + text + ')';
+     var code = '`echo ' + text + ' | tr \'[:upper:]\' \'[:lower:]\'`';
   } else if (block.getFieldValue('CASE') == 'TITLECASE') {
-    var code = 'ucwords(strtolower(' + text + '))';
+    var code = '`echo ' + text + ' | awk \'{for(j=1;j<=NF;j++){ $j=toupper(substr($j,1,1)) tolower(substr($j,2)) }}1\'`';
   }
   return [code, Blockly.smash.ORDER_FUNCTION_CALL];
 };
@@ -183,14 +183,14 @@ Blockly.smash['text_changeCase'] = function(block) {
 Blockly.smash['text_trim'] = function(block) {
   // Trim spaces.
   var OPERATORS = {
-    'LEFT': 'ltrim',
-    'RIGHT': 'rtrim',
-    'BOTH': 'trim'
+    'LEFT': ' | sed -e \'s/^[ \\t]*//\'',
+    'RIGHT': ' | sed \'s/[ \\t]*$//\'',
+    'BOTH': ' | sed \'s/^[ \\t]*//;s/[ \\t]*$//\''
   };
   var operator = OPERATORS[block.getFieldValue('MODE')];
   var text = Blockly.smash.valueToCode(block, 'TEXT',
       Blockly.smash.ORDER_NONE) || '\'\'';
-  return [operator + '(' + text + ')', Blockly.smash.ORDER_FUNCTION_CALL];
+  return ['`echo '+ text + operator + '`', Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
 Blockly.smash['text_print'] = function(block) {
@@ -208,13 +208,11 @@ Blockly.smash['text_prompt_ext'] = function(block) {
   } else {
     // External message.
     var msg = Blockly.smash.valueToCode(block, 'TEXT',
-        Blockly.smash.ORDER_NONE) || '\'\'';
+        Blockly.smash.ORDER_NONE) || '""';
   }
-  var code = 'readline(' + msg + ')';
-  var toNumber = block.getFieldValue('TYPE') == 'NUMBER';
-  if (toNumber) {
-    code = 'floatval(' + code + ')';
-  }
+  // TODO allow for prompt message to be displayed
+  var code = '`read temp; echo $temp`';
+
   return [code, Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
