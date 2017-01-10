@@ -99,28 +99,32 @@ Blockly.smash['text_charAt'] = function(block) {
   var textOrder = (where == 'RANDOM') ? Blockly.smash.ORDER_NONE :
       Blockly.smash.ORDER_COMMA;
   var text = Blockly.smash.valueToCode(block, 'VALUE', textOrder) || '\'\'';
+  text = Blockly.smash.strip$(text);
+
   switch (where) {
     case 'FIRST':
-      var code = 'substr(' + text + ', 0, 1)';
+      var code = '${' + text + ':0:1}';
       return [code, Blockly.smash.ORDER_FUNCTION_CALL];
     case 'LAST':
-      var code = 'substr(' + text + ', -1)';
+      var code = '${' + text + ':(-1):1}';
       return [code, Blockly.smash.ORDER_FUNCTION_CALL];
     case 'FROM_START':
       var at = Blockly.smash.getAdjusted(block, 'AT');
-      var code = 'substr(' + text + ', ' + at + ', 1)';
+      var code = '${' + text + ':' + at + ':1}';
       return [code, Blockly.smash.ORDER_FUNCTION_CALL];
     case 'FROM_END':
       var at = Blockly.smash.getAdjusted(block, 'AT', 1, true);
-      var code = 'substr(' + text + ', ' + at + ', 1)';
+      var code = '${' + text + ':(' + at + '):1}';
       return [code, Blockly.smash.ORDER_FUNCTION_CALL];
     case 'RANDOM':
       var functionName = Blockly.smash.provideFunction_(
           'text_random_letter',
-          ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + '($text) {',
-           '  return $text[rand(0, strlen($text) - 1)];',
+          ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+           '  local _t="${1}"',
+           '  local i=$(($RANDOM % ${#_t}))',
+           '  echo ${text:$i:1};',
            '}']);
-      code = functionName + '(' + text + ')';
+      code = '`' + functionName + ' ' + text + '`';
       return [code, Blockly.smash.ORDER_FUNCTION_CALL];
   }
   throw 'Unhandled option (text_charAt).';
@@ -139,29 +143,33 @@ Blockly.smash['text_getSubstring'] = function(block) {
     var at2 = Blockly.smash.getAdjusted(block, 'AT2');
     var functionName = Blockly.smash.provideFunction_(
         'text_get_substring',
-        ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ +
-            '($text, $where1, $at1, $where2, $at2) {',
-         '  if ($where1 == \'FROM_END\') {',
-         '    $at1 = strlen($text) - 1 - $at1;',
-         '  } else if ($where1 == \'FIRST\') {',
-         '    $at1 = 0;',
-         '  } else if ($where1 != \'FROM_START\'){',
-         '    throw new Exception(\'Unhandled option (text_get_substring).\');',
-         '  }',
-         '  $length = 0;',
-         '  if ($where2 == \'FROM_START\') {',
-         '    $length = $at2 - $at1 + 1;',
-         '  } else if ($where2 == \'FROM_END\') {',
-         '    $length = strlen($text) - $at1 - $at2;',
-         '  } else if ($where2 == \'LAST\') {',
-         '    $length = strlen($text) - $at1;',
-         '  } else {',
-         '    throw new Exception(\'Unhandled option (text_get_substring).\');',
-         '  }',
-         '  return substr($text, $at1, $length);',
+        ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+         '  text="${1}"',
+         '  where1="${2}"',
+         '  at1="${3}"',
+         '  where2="${4}"',
+         '  at2="${5}"',
+         '  if [ $where1 == FROM_END ]; then',
+         '    at1=$((${#text} - 1 - $at1))',
+         '  elif [ $where1 == FIRST ]; then',
+         '    at1=0',
+         '  elif [ $where1 != FROM_START ]; then',
+         '    exit 1',
+         '  fi',
+         '  length=0',
+         '  if [ $where2 == FROM_START ]; then',
+         '    length=$(($at2 - $at1 + 1))',
+         '  elif [ $where2 == FROM_END ]; then',
+         '    length=$((${#text} - $at1 - $at2))',
+         '  elif [ $where2 == LAST ]; then',
+         '    length=$((${#text} - $at1))',
+         '  else',
+         '    exit 1',
+         '  fi',
+         '  echo ${text:$at1:$length}',
          '}']);
-    var code = functionName + '(' + text + ', \'' +
-        where1 + '\', ' + at1 + ', \'' + where2 + '\', ' + at2 + ')';
+    var code = '`' + functionName + ' ' + text + ' "' +
+        where1 + '" ' + at1 + ' "' + where2 + '" ' + at2 + '`';
   }
   return [code, Blockly.smash.ORDER_FUNCTION_CALL];
 };
