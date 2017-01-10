@@ -67,29 +67,29 @@ Blockly.smash['text_isEmpty'] = function(block) {
 
 Blockly.smash['text_indexOf'] = function(block) {
   // Search the text for a substring.
-  var operator = block.getFieldValue('END') == 'FIRST' ?
-      'strpos' : 'strrpos';
   var substring = Blockly.smash.valueToCode(block, 'FIND',
-      Blockly.smash.ORDER_NONE) || '\'\'';
+      Blockly.smash.ORDER_NONE) || '""';
   var text = Blockly.smash.valueToCode(block, 'VALUE',
-      Blockly.smash.ORDER_NONE) || '\'\'';
-  if (block.workspace.options.oneBasedIndex) {
-    var errorIndex = ' 0';
-    var indexAdjustment = ' + 1';
-  } else {
-    var errorIndex = ' -1';
-    var indexAdjustment = '';
-  }
-  var functionName = Blockly.smash.provideFunction_(
-      block.getFieldValue('END') == 'FIRST' ?
-          'text_indexOf' : 'text_lastIndexOf',
-      ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ +
-          '($text, $search) {',
-       '  $pos = ' + operator + '($text, $search);',
-       '  return $pos === false ? ' + errorIndex + ' : $pos' +
-          indexAdjustment + ';',
-       '}']);
-  var code = functionName + '(' + text + ', ' + substring + ')';
+      Blockly.smash.ORDER_NONE) || '""';
+
+    //TODO does not work with spaces
+    if (block.getFieldValue('END') == 'FIRST'){
+      var op ='${text##"${search}"*}';
+    } else {
+      var op ='${text%%"${search}"*}';
+    }
+
+    var functionName = Blockly.smash.provideFunction_(
+        block.getFieldValue('END') == 'FIRST' ?
+            'text_indexOf' : 'text_lastIndexOf',
+        ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+         '  text="${1}"',
+         '  search="${2}"',
+         '  pfix=' + op,
+         '  pos=${#pfix}',
+         '  echo $pos',
+         '}']);
+  var code = '`' + functionName + ' ' + text + ' ' + substring + '`';
   return [code, Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
