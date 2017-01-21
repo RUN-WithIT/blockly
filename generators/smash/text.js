@@ -72,11 +72,10 @@ Blockly.smash['text_indexOf'] = function(block) {
   var text = Blockly.smash.valueToCode(block, 'VALUE',
       Blockly.smash.ORDER_NONE) || '""';
 
-    //TODO does not work with spaces
     if (block.getFieldValue('END') == 'FIRST'){
-      var op ='${text##"${search}"*}';
-    } else {
       var op ='${text%%"${search}"*}';
+    } else {
+      var op ='${text##"${search}"*}';
     }
 
     var functionName = Blockly.smash.provideFunction_(
@@ -89,7 +88,7 @@ Blockly.smash['text_indexOf'] = function(block) {
          '  pos=${#pfix}',
          '  echo $pos',
          '}']);
-  var code = '`' + functionName + ' ' + text + ' ' + substring + '`';
+  var code = '`' + functionName + ' "' + text + '" ' + substring + '`';
   return [code, Blockly.smash.ORDER_FUNCTION_CALL];
 };
 
