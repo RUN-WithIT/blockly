@@ -1,15 +1,15 @@
 'use strict';
 
-goog.provide('Blockly.smash');
+goog.provide('Blockly.bash');
 
 goog.require('Blockly.Generator');
 
 
 /**
- * smash code generator.
+ * bash code generator.
  * @type {!Blockly.Generator}
  */
-Blockly.smash = new Blockly.Generator('smash');
+Blockly.bash = new Blockly.Generator('bash');
 
 /**
  * List of illegal variable names.
@@ -18,7 +18,7 @@ Blockly.smash = new Blockly.Generator('smash');
  * accidentally clobbering a built-in object or function.
  * @private
  */
-Blockly.smash.addReservedWords(
+Blockly.bash.addReservedWords(
         // http://php.net/manual/en/reserved.keywords.php
     '__halt_compiler,abstract,and,array,as,break,callable,case,catch,class,' +
     'clone,const,continue,declare,default,die,do,echo,else,elseif,empty,' +
@@ -45,93 +45,93 @@ Blockly.smash.addReservedWords(
  * Order of operation ENUMs.
  * http://php.net/manual/en/language.operators.precedence.php
  */
-Blockly.smash.ORDER_ATOMIC = 0;             // 0 "" ...
-Blockly.smash.ORDER_CLONE = 1;              // clone
-Blockly.smash.ORDER_NEW = 1;                // new
-Blockly.smash.ORDER_MEMBER = 2.1;           // []
-Blockly.smash.ORDER_FUNCTION_CALL = 2.2;    // ()
-Blockly.smash.ORDER_POWER = 3;              // **
-Blockly.smash.ORDER_INCREMENT = 4;          // ++
-Blockly.smash.ORDER_DECREMENT = 4;          // --
-Blockly.smash.ORDER_BITWISE_NOT = 4;        // ~
-Blockly.smash.ORDER_CAST = 4;               // (int) (float) (string) (array) ...
-Blockly.smash.ORDER_SUPPRESS_ERROR = 4;     // @
-Blockly.smash.ORDER_INSTANCEOF = 5;         // instanceof
-Blockly.smash.ORDER_LOGICAL_NOT = 6;        // !
-Blockly.smash.ORDER_UNARY_PLUS = 7.1;       // +
-Blockly.smash.ORDER_UNARY_NEGATION = 7.2;   // -
-Blockly.smash.ORDER_MULTIPLICATION = 8.1;   // *
-Blockly.smash.ORDER_DIVISION = 8.2;         // /
-Blockly.smash.ORDER_MODULUS = 8.3;          // %
-Blockly.smash.ORDER_ADDITION = 9.1;         // +
-Blockly.smash.ORDER_SUBTRACTION = 9.2;      // -
-Blockly.smash.ORDER_STRING_CONCAT = 9.3;    // .
-Blockly.smash.ORDER_BITWISE_SHIFT = 10;     // << >>
-Blockly.smash.ORDER_RELATIONAL = 11;        // < <= > >=
-Blockly.smash.ORDER_EQUALITY = 12;          // == != === !== <> <=>
-Blockly.smash.ORDER_REFERENCE = 13;         // &
-Blockly.smash.ORDER_BITWISE_AND = 13;       // &
-Blockly.smash.ORDER_BITWISE_XOR = 14;       // ^
-Blockly.smash.ORDER_BITWISE_OR = 15;        // |
-Blockly.smash.ORDER_LOGICAL_AND = 16;       // &&
-Blockly.smash.ORDER_LOGICAL_OR = 17;        // ||
-Blockly.smash.ORDER_IF_NULL = 18;           // ??
-Blockly.smash.ORDER_CONDITIONAL = 19;       // ?:
-Blockly.smash.ORDER_ASSIGNMENT = 20;        // = += -= *= /= %= <<= >>= ...
-Blockly.smash.ORDER_LOGICAL_AND_WEAK = 21;  // and
-Blockly.smash.ORDER_LOGICAL_XOR = 22;       // xor
-Blockly.smash.ORDER_LOGICAL_OR_WEAK = 23;   // or
-Blockly.smash.ORDER_COMMA = 24;             // ,
-Blockly.smash.ORDER_NONE = 99;              // (...)
+Blockly.bash.ORDER_ATOMIC = 0;             // 0 "" ...
+Blockly.bash.ORDER_CLONE = 1;              // clone
+Blockly.bash.ORDER_NEW = 1;                // new
+Blockly.bash.ORDER_MEMBER = 2.1;           // []
+Blockly.bash.ORDER_FUNCTION_CALL = 2.2;    // ()
+Blockly.bash.ORDER_POWER = 3;              // **
+Blockly.bash.ORDER_INCREMENT = 4;          // ++
+Blockly.bash.ORDER_DECREMENT = 4;          // --
+Blockly.bash.ORDER_BITWISE_NOT = 4;        // ~
+Blockly.bash.ORDER_CAST = 4;               // (int) (float) (string) (array) ...
+Blockly.bash.ORDER_SUPPRESS_ERROR = 4;     // @
+Blockly.bash.ORDER_INSTANCEOF = 5;         // instanceof
+Blockly.bash.ORDER_LOGICAL_NOT = 6;        // !
+Blockly.bash.ORDER_UNARY_PLUS = 7.1;       // +
+Blockly.bash.ORDER_UNARY_NEGATION = 7.2;   // -
+Blockly.bash.ORDER_MULTIPLICATION = 8.1;   // *
+Blockly.bash.ORDER_DIVISION = 8.2;         // /
+Blockly.bash.ORDER_MODULUS = 8.3;          // %
+Blockly.bash.ORDER_ADDITION = 9.1;         // +
+Blockly.bash.ORDER_SUBTRACTION = 9.2;      // -
+Blockly.bash.ORDER_STRING_CONCAT = 9.3;    // .
+Blockly.bash.ORDER_BITWISE_SHIFT = 10;     // << >>
+Blockly.bash.ORDER_RELATIONAL = 11;        // < <= > >=
+Blockly.bash.ORDER_EQUALITY = 12;          // == != === !== <> <=>
+Blockly.bash.ORDER_REFERENCE = 13;         // &
+Blockly.bash.ORDER_BITWISE_AND = 13;       // &
+Blockly.bash.ORDER_BITWISE_XOR = 14;       // ^
+Blockly.bash.ORDER_BITWISE_OR = 15;        // |
+Blockly.bash.ORDER_LOGICAL_AND = 16;       // &&
+Blockly.bash.ORDER_LOGICAL_OR = 17;        // ||
+Blockly.bash.ORDER_IF_NULL = 18;           // ??
+Blockly.bash.ORDER_CONDITIONAL = 19;       // ?:
+Blockly.bash.ORDER_ASSIGNMENT = 20;        // = += -= *= /= %= <<= >>= ...
+Blockly.bash.ORDER_LOGICAL_AND_WEAK = 21;  // and
+Blockly.bash.ORDER_LOGICAL_XOR = 22;       // xor
+Blockly.bash.ORDER_LOGICAL_OR_WEAK = 23;   // or
+Blockly.bash.ORDER_COMMA = 24;             // ,
+Blockly.bash.ORDER_NONE = 99;              // (...)
 
 /**
  * List of outer-inner pairings that do NOT require parentheses.
  * @type {!Array.<!Array.<number>>}
  */
-Blockly.smash.ORDER_OVERRIDES = [
+Blockly.bash.ORDER_OVERRIDES = [
   // (foo()).bar() -> foo().bar()
   // (foo())[0] -> foo()[0]
-  [Blockly.smash.ORDER_MEMBER, Blockly.smash.ORDER_FUNCTION_CALL],
+  [Blockly.bash.ORDER_MEMBER, Blockly.bash.ORDER_FUNCTION_CALL],
   // (foo[0])[1] -> foo[0][1]
   // (foo.bar).baz -> foo.bar.baz
-  [Blockly.smash.ORDER_MEMBER, Blockly.smash.ORDER_MEMBER],
+  [Blockly.bash.ORDER_MEMBER, Blockly.bash.ORDER_MEMBER],
   // !(!foo) -> !!foo
-  [Blockly.smash.ORDER_LOGICAL_NOT, Blockly.smash.ORDER_LOGICAL_NOT],
+  [Blockly.bash.ORDER_LOGICAL_NOT, Blockly.bash.ORDER_LOGICAL_NOT],
   // a * (b * c) -> a * b * c
-  [Blockly.smash.ORDER_MULTIPLICATION, Blockly.smash.ORDER_MULTIPLICATION],
+  [Blockly.bash.ORDER_MULTIPLICATION, Blockly.bash.ORDER_MULTIPLICATION],
   // a + (b + c) -> a + b + c
-  [Blockly.smash.ORDER_ADDITION, Blockly.smash.ORDER_ADDITION],
+  [Blockly.bash.ORDER_ADDITION, Blockly.bash.ORDER_ADDITION],
   // a && (b && c) -> a && b && c
-  [Blockly.smash.ORDER_LOGICAL_AND, Blockly.smash.ORDER_LOGICAL_AND],
+  [Blockly.bash.ORDER_LOGICAL_AND, Blockly.bash.ORDER_LOGICAL_AND],
   // a || (b || c) -> a || b || c
-  [Blockly.smash.ORDER_LOGICAL_OR, Blockly.smash.ORDER_LOGICAL_OR]
+  [Blockly.bash.ORDER_LOGICAL_OR, Blockly.bash.ORDER_LOGICAL_OR]
 ];
 
 /**
  * Initialise the database of variable names.
  * @param {!Blockly.Workspace} workspace Workspace to generate code from.
  */
-Blockly.smash.init = function(workspace) {
+Blockly.bash.init = function(workspace) {
   // Create a dictionary of definitions to be printed before the code.
-  Blockly.smash.definitions_ = Object.create(null);
+  Blockly.bash.definitions_ = Object.create(null);
   // Create a dictionary mapping desired function names in definitions_
   // to actual function names (to avoid collisions with user functions).
-  Blockly.smash.functionNames_ = Object.create(null);
+  Blockly.bash.functionNames_ = Object.create(null);
 
-  if (!Blockly.smash.variableDB_) {
-    Blockly.smash.variableDB_ =
-        new Blockly.Names(Blockly.smash.RESERVED_WORDS_);
+  if (!Blockly.bash.variableDB_) {
+    Blockly.bash.variableDB_ =
+        new Blockly.Names(Blockly.bash.RESERVED_WORDS_);
   } else {
-    Blockly.smash.variableDB_.reset();
+    Blockly.bash.variableDB_.reset();
   }
 
   var defvars = [];
   var variables = Blockly.Variables.allVariables(workspace);
   for (var i = 0; i < variables.length; i++) {
-    defvars[i] = Blockly.smash.variableDB_.getName(variables[i],
+    defvars[i] = Blockly.bash.variableDB_.getName(variables[i],
         Blockly.Variables.NAME_TYPE) + '=""';
   }
-  Blockly.smash.definitions_['variables'] = defvars.join('\n');
+  Blockly.bash.definitions_['variables'] = defvars.join('\n');
 };
 
 /**
@@ -139,16 +139,16 @@ Blockly.smash.init = function(workspace) {
  * @param {string} code Generated code.
  * @return {string} Completed code.
  */
-Blockly.smash.finish = function(code) {
+Blockly.bash.finish = function(code) {
   // Convert the definitions dictionary into a list.
   var definitions = [];
-  for (var name in Blockly.smash.definitions_) {
-    definitions.push(Blockly.smash.definitions_[name]);
+  for (var name in Blockly.bash.definitions_) {
+    definitions.push(Blockly.bash.definitions_[name]);
   }
   // Clean up temporary data.
-  delete Blockly.smash.definitions_;
-  delete Blockly.smash.functionNames_;
-  Blockly.smash.variableDB_.reset();
+  delete Blockly.bash.definitions_;
+  delete Blockly.bash.functionNames_;
+  Blockly.bash.variableDB_.reset();
   return definitions.join('\n\n') + '\n\n\n' + code;
 };
 
@@ -158,7 +158,7 @@ Blockly.smash.finish = function(code) {
  * @param {string} line Line of generated code.
  * @return {string} Legal line of code.
  */
-Blockly.smash.scrubNakedValue = function(line) {
+Blockly.bash.scrubNakedValue = function(line) {
   return line + '\n';
 };
 
@@ -166,10 +166,10 @@ Blockly.smash.scrubNakedValue = function(line) {
  * Encode a string as a properly escaped bash string, complete with
  * quotes.
  * @param {string} string Text to encode.
- * @return {string} smash string.
+ * @return {string} bash string.
  * @private
  */
-Blockly.smash.quote_ = function(string) {
+Blockly.bash.quote_ = function(string) {
   string = string.replace(/\\/g, '\\\\')
                  .replace(/\n/g, '\\\n')
                  .replace(/'/g, '\\\'');
@@ -177,23 +177,23 @@ Blockly.smash.quote_ = function(string) {
 };
 
 /**
- * Common tasks for generating smash from blocks.
+ * Common tasks for generating bash from blocks.
  * Handles comments for the specified block and any connected value blocks.
  * Calls any statements following this block.
  * @param {!Blockly.Block} block The current block.
- * @param {string} code The smash code created for this block.
- * @return {string} smash code with comments and subsequent blocks added.
+ * @param {string} code The bash code created for this block.
+ * @return {string} bash code with comments and subsequent blocks added.
  * @private
  */
-Blockly.smash.scrub_ = function(block, code) {
+Blockly.bash.scrub_ = function(block, code) {
   var commentCode = '';
   // Only collect comments for blocks that aren't inline.
   if (!block.outputConnection || !block.outputConnection.targetConnection) {
     // Collect comment for this block.
     var comment = block.getCommentText();
-    comment = Blockly.utils.wrap(comment, Blockly.smash.COMMENT_WRAP - 3);
+    comment = Blockly.utils.wrap(comment, Blockly.bash.COMMENT_WRAP - 3);
     if (comment) {
-      commentCode += Blockly.smash.prefixLines(comment, '# ') + '\n';
+      commentCode += Blockly.bash.prefixLines(comment, '# ') + '\n';
     }
     // Collect comments for all value arguments.
     // Don't collect comments for nested statements.
@@ -201,16 +201,16 @@ Blockly.smash.scrub_ = function(block, code) {
       if (block.inputList[i].type == Blockly.INPUT_VALUE) {
         var childBlock = block.inputList[i].connection.targetBlock();
         if (childBlock) {
-          var comment = Blockly.smash.allNestedComments(childBlock);
+          var comment = Blockly.bash.allNestedComments(childBlock);
           if (comment) {
-            commentCode += Blockly.smash.prefixLines(comment, '# ');
+            commentCode += Blockly.bash.prefixLines(comment, '# ');
           }
         }
       }
     }
   }
   var nextBlock = block.nextConnection && block.nextConnection.targetBlock();
-  var nextCode = Blockly.smash.blockToCode(nextBlock);
+  var nextCode = Blockly.bash.blockToCode(nextBlock);
   return commentCode + code + nextCode;
 };
 
@@ -223,25 +223,25 @@ Blockly.smash.scrub_ = function(block, code) {
  * @param {number=} opt_order The highest order acting on this value.
  * @return {string|number}
  */
-Blockly.smash.getAdjusted = function(block, atId, opt_delta, opt_negate,
+Blockly.bash.getAdjusted = function(block, atId, opt_delta, opt_negate,
     opt_order) {
   var delta = opt_delta || 0;
-  var order = opt_order || Blockly.smash.ORDER_NONE;
+  var order = opt_order || Blockly.bash.ORDER_NONE;
   if (block.workspace.options.oneBasedIndex) {
     delta--;
   }
   var defaultAtIndex = block.workspace.options.oneBasedIndex ? '1' : '0';
   if (delta > 0) {
-    var at = Blockly.smash.valueToCode(block, atId,
-            Blockly.smash.ORDER_ADDITION) || defaultAtIndex;
+    var at = Blockly.bash.valueToCode(block, atId,
+            Blockly.bash.ORDER_ADDITION) || defaultAtIndex;
   } else if (delta < 0) {
-    var at = Blockly.smash.valueToCode(block, atId,
-            Blockly.smash.ORDER_SUBTRACTION) || defaultAtIndex;
+    var at = Blockly.bash.valueToCode(block, atId,
+            Blockly.bash.ORDER_SUBTRACTION) || defaultAtIndex;
   } else if (opt_negate) {
-    var at = Blockly.smash.valueToCode(block, atId,
-            Blockly.smash.ORDER_UNARY_NEGATION) || defaultAtIndex;
+    var at = Blockly.bash.valueToCode(block, atId,
+            Blockly.bash.ORDER_UNARY_NEGATION) || defaultAtIndex;
   } else {
-    var at = Blockly.smash.valueToCode(block, atId, order) ||
+    var at = Blockly.bash.valueToCode(block, atId, order) ||
         defaultAtIndex;
   }
 
@@ -255,10 +255,10 @@ Blockly.smash.getAdjusted = function(block, atId, opt_delta, opt_negate,
     // If the index is dynamic, adjust it in code.
     if (delta > 0) {
       at = at + ' + ' + delta;
-      var innerOrder = Blockly.smash.ORDER_ADDITION;
+      var innerOrder = Blockly.bash.ORDER_ADDITION;
     } else if (delta < 0) {
       at = at + ' - ' + -delta;
-      var innerOrder = Blockly.smash.ORDER_SUBTRACTION;
+      var innerOrder = Blockly.bash.ORDER_SUBTRACTION;
     }
     if (opt_negate) {
       if (delta) {
@@ -266,7 +266,7 @@ Blockly.smash.getAdjusted = function(block, atId, opt_delta, opt_negate,
       } else {
         at = '-' + at;
       }
-      var innerOrder = Blockly.smash.ORDER_UNARY_NEGATION;
+      var innerOrder = Blockly.bash.ORDER_UNARY_NEGATION;
     }
     innerOrder = Math.floor(innerOrder);
     order = Math.floor(order);
@@ -282,7 +282,7 @@ Blockly.smash.getAdjusted = function(block, atId, opt_delta, opt_negate,
  * @param {sting} variable name.
  * @return {string}
  */
-Blockly.smash.strip$ = function(variable) {
+Blockly.bash.strip$ = function(variable) {
     if (typeof variable != "string") {
         return variable;
     }

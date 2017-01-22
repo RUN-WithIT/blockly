@@ -1,28 +1,28 @@
 'use strict';
 
-goog.provide('Blockly.smash.loops');
+goog.provide('Blockly.bash.loops');
 
-goog.require('Blockly.smash');
+goog.require('Blockly.bash');
 
 
-Blockly.smash['controls_repeat_ext'] = function(block) {
+Blockly.bash['controls_repeat_ext'] = function(block) {
   // Repeat n times.
   if (block.getField('TIMES')) {
     // Internal number.
     var repeats = String(Number(block.getFieldValue('TIMES')));
   } else {
     // External number.
-    var repeats = Blockly.smash.valueToCode(block, 'TIMES',
-        Blockly.smash.ORDER_ASSIGNMENT) || '0';
+    var repeats = Blockly.bash.valueToCode(block, 'TIMES',
+        Blockly.bash.ORDER_ASSIGNMENT) || '0';
   }
-  var branch = Blockly.smash.statementToCode(block, 'DO');
-  branch = Blockly.smash.addLoopTrap(branch, block.id);
+  var branch = Blockly.bash.statementToCode(block, 'DO');
+  branch = Blockly.bash.addLoopTrap(branch, block.id);
   var code = '';
-  var loopVar = Blockly.smash.variableDB_.getDistinctName(
+  var loopVar = Blockly.bash.variableDB_.getDistinctName(
       'count', Blockly.Variables.NAME_TYPE);
   var endVar = repeats;
   if (!repeats.match(/^\w+$/) && !Blockly.isNumber(repeats)) {
-    var endVar = Blockly.smash.variableDB_.getDistinctName(
+    var endVar = Blockly.bash.variableDB_.getDistinctName(
         'repeat_end', Blockly.Variables.NAME_TYPE);
     code += endVar + ' = ' + repeats + ';\n';
   }
@@ -33,34 +33,34 @@ Blockly.smash['controls_repeat_ext'] = function(block) {
   return code;
 };
 
-Blockly.smash['controls_repeat'] = Blockly.smash['controls_repeat_ext'];
+Blockly.bash['controls_repeat'] = Blockly.bash['controls_repeat_ext'];
 
-Blockly.smash['controls_whileUntil'] = function(block) {
+Blockly.bash['controls_whileUntil'] = function(block) {
   // Do while/until loop.
   var until = block.getFieldValue('MODE') == 'UNTIL';
-  var argument0 = Blockly.smash.valueToCode(block, 'BOOL',
-      until ? Blockly.smash.ORDER_LOGICAL_NOT :
-      Blockly.smash.ORDER_NONE) || 'false';
-  var branch = Blockly.smash.statementToCode(block, 'DO');
-  branch = Blockly.smash.addLoopTrap(branch, block.id);
+  var argument0 = Blockly.bash.valueToCode(block, 'BOOL',
+      until ? Blockly.bash.ORDER_LOGICAL_NOT :
+      Blockly.bash.ORDER_NONE) || 'false';
+  var branch = Blockly.bash.statementToCode(block, 'DO');
+  branch = Blockly.bash.addLoopTrap(branch, block.id);
   if (until) {
     argument0 = '!' + argument0;
   }
   return 'while [ ' + argument0 + ' ] ; do\n' + branch + 'done\n';
 };
 
-Blockly.smash['controls_for'] = function(block) {
+Blockly.bash['controls_for'] = function(block) {
   // For loop.
-  var variable0 = Blockly.smash.variableDB_.getName(
+  var variable0 = Blockly.bash.variableDB_.getName(
       block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
-  var argument0 = Blockly.smash.valueToCode(block, 'FROM',
-      Blockly.smash.ORDER_ASSIGNMENT) || '0';
-  var argument1 = Blockly.smash.valueToCode(block, 'TO',
-      Blockly.smash.ORDER_ASSIGNMENT) || '0';
-  var increment = Blockly.smash.valueToCode(block, 'BY',
-      Blockly.smash.ORDER_ASSIGNMENT) || '1';
-  var branch = Blockly.smash.statementToCode(block, 'DO');
-  branch = Blockly.smash.addLoopTrap(branch, block.id);
+  var argument0 = Blockly.bash.valueToCode(block, 'FROM',
+      Blockly.bash.ORDER_ASSIGNMENT) || '0';
+  var argument1 = Blockly.bash.valueToCode(block, 'TO',
+      Blockly.bash.ORDER_ASSIGNMENT) || '0';
+  var increment = Blockly.bash.valueToCode(block, 'BY',
+      Blockly.bash.ORDER_ASSIGNMENT) || '1';
+  var branch = Blockly.bash.statementToCode(block, 'DO');
+  branch = Blockly.bash.addLoopTrap(branch, block.id);
   var code;
   if (Blockly.isNumber(argument0) && Blockly.isNumber(argument1) &&
       Blockly.isNumber(increment)) {
@@ -81,19 +81,19 @@ Blockly.smash['controls_for'] = function(block) {
     // Cache non-trivial values to variables to prevent repeated look-ups.
     var startVar = argument0;
     if (!argument0.match(/^\w+$/) && !Blockly.isNumber(argument0)) {
-      startVar = Blockly.smash.variableDB_.getDistinctName(
+      startVar = Blockly.bash.variableDB_.getDistinctName(
           variable0 + '_start', Blockly.Variables.NAME_TYPE);
       code += startVar + '=' + argument0 + ';\n';
     }
     var endVar = argument1;
     if (!argument1.match(/^\w+$/) && !Blockly.isNumber(argument1)) {
-      var endVar = "$" + Blockly.smash.variableDB_.getDistinctName(
+      var endVar = "$" + Blockly.bash.variableDB_.getDistinctName(
           variable0 + '_end', Blockly.Variables.NAME_TYPE);
       code += endVar + '=' + argument1 + '\n';
     }
     // Determine loop direction at start, in case one of the bounds
     // changes during loop execution.
-    var incVar = Blockly.smash.variableDB_.getDistinctName(
+    var incVar = Blockly.bash.variableDB_.getDistinctName(
         variable0 + '_inc', Blockly.Variables.NAME_TYPE);
     code += incVar + '=';
     if (Blockly.isNumber(increment)) {
@@ -102,7 +102,7 @@ Blockly.smash['controls_for'] = function(block) {
       code += 'abs(' + increment + ');\n';
     }
     code += 'if [ $' + startVar + ' -gt ' + endVar + ' ]; then\n';
-    code += Blockly.smash.INDENT + incVar + '=-$' + incVar + '\n';
+    code += Blockly.bash.INDENT + incVar + '=-$' + incVar + '\n';
     code += 'fi\n';
     code += 'for ((' + variable0 + '=$' + startVar + '; ' +
         '$([ $' + incVar + ' -gt 0 ] && ' +
@@ -114,14 +114,14 @@ Blockly.smash['controls_for'] = function(block) {
   return code;
 };
 
-Blockly.smash['controls_forEach'] = function(block) {
+Blockly.bash['controls_forEach'] = function(block) {
   // For each loop.
-  var variable0 = Blockly.smash.variableDB_.getName(
+  var variable0 = Blockly.bash.variableDB_.getName(
       block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
-  var argument0 = Blockly.smash.valueToCode(block, 'LIST',
-      Blockly.smash.ORDER_ASSIGNMENT) || '()';
-  var branch = Blockly.smash.statementToCode(block, 'DO');
-  branch = Blockly.smash.addLoopTrap(branch, block.id);
+  var argument0 = Blockly.bash.valueToCode(block, 'LIST',
+      Blockly.bash.ORDER_ASSIGNMENT) || '()';
+  var branch = Blockly.bash.statementToCode(block, 'DO');
+  branch = Blockly.bash.addLoopTrap(branch, block.id);
   var code = '';
   if (argument0.indexOf("(") == 0){
         argument0 = argument0.slice(1,-1)
@@ -134,7 +134,7 @@ Blockly.smash['controls_forEach'] = function(block) {
   return code;
 };
 
-Blockly.smash['controls_flow_statements'] = function(block) {
+Blockly.bash['controls_flow_statements'] = function(block) {
   // Flow statements: continue, break.
   switch (block.getFieldValue('FLOW')) {
     case 'BREAK':

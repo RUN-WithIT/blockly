@@ -1,39 +1,39 @@
 'use strict';
 
-goog.provide('Blockly.smash.colour');
+goog.provide('Blockly.bash.colour');
 
-goog.require('Blockly.smash');
+goog.require('Blockly.bash');
 
 
-Blockly.smash['colour_picker'] = function(block) {
+Blockly.bash['colour_picker'] = function(block) {
   // Colour picker.
   var code = '\'' + block.getFieldValue('COLOUR') + '\'';
-  return [code, Blockly.smash.ORDER_ATOMIC];
+  return [code, Blockly.bash.ORDER_ATOMIC];
 };
 
-Blockly.smash['colour_random'] = function(block) {
+Blockly.bash['colour_random'] = function(block) {
   // Generate a random colour.
-  var functionName = Blockly.smash.provideFunction_(
+  var functionName = Blockly.bash.provideFunction_(
       'colour_random',
-      ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + '() {',
+      ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + '() {',
        '  return \'#\' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), ' +
           '6, \'0\', STR_PAD_LEFT);',
        '}']);
   var code = functionName + '()';
-  return [code, Blockly.smash.ORDER_FUNCTION_CALL];
+  return [code, Blockly.bash.ORDER_FUNCTION_CALL];
 };
 
-Blockly.smash['colour_rgb'] = function(block) {
+Blockly.bash['colour_rgb'] = function(block) {
   // Compose a colour from RGB components expressed as percentages.
-  var red = Blockly.smash.valueToCode(block, 'RED',
-      Blockly.smash.ORDER_COMMA) || 0;
-  var green = Blockly.smash.valueToCode(block, 'GREEN',
-      Blockly.smash.ORDER_COMMA) || 0;
-  var blue = Blockly.smash.valueToCode(block, 'BLUE',
-      Blockly.smash.ORDER_COMMA) || 0;
-  var functionName = Blockly.smash.provideFunction_(
+  var red = Blockly.bash.valueToCode(block, 'RED',
+      Blockly.bash.ORDER_COMMA) || 0;
+  var green = Blockly.bash.valueToCode(block, 'GREEN',
+      Blockly.bash.ORDER_COMMA) || 0;
+  var blue = Blockly.bash.valueToCode(block, 'BLUE',
+      Blockly.bash.ORDER_COMMA) || 0;
+  var functionName = Blockly.bash.provideFunction_(
       'colour_rgb',
-      ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ +
+      ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ +
           '($r, $g, $b) {',
        '  $r = round(max(min($r, 100), 0) * 2.55);',
        '  $g = round(max(min($g, 100), 0) * 2.55);',
@@ -45,20 +45,20 @@ Blockly.smash['colour_rgb'] = function(block) {
        '  return $hex;',
        '}']);
   var code = functionName + '(' + red + ', ' + green + ', ' + blue + ')';
-  return [code, Blockly.smash.ORDER_FUNCTION_CALL];
+  return [code, Blockly.bash.ORDER_FUNCTION_CALL];
 };
 
-Blockly.smash['colour_blend'] = function(block) {
+Blockly.bash['colour_blend'] = function(block) {
   // Blend two colours together.
-  var c1 = Blockly.smash.valueToCode(block, 'COLOUR1',
-      Blockly.smash.ORDER_COMMA) || '\'#000000\'';
-  var c2 = Blockly.smash.valueToCode(block, 'COLOUR2',
-      Blockly.smash.ORDER_COMMA) || '\'#000000\'';
-  var ratio = Blockly.smash.valueToCode(block, 'RATIO',
-      Blockly.smash.ORDER_COMMA) || 0.5;
-  var functionName = Blockly.smash.provideFunction_(
+  var c1 = Blockly.bash.valueToCode(block, 'COLOUR1',
+      Blockly.bash.ORDER_COMMA) || '\'#000000\'';
+  var c2 = Blockly.bash.valueToCode(block, 'COLOUR2',
+      Blockly.bash.ORDER_COMMA) || '\'#000000\'';
+  var ratio = Blockly.bash.valueToCode(block, 'RATIO',
+      Blockly.bash.ORDER_COMMA) || 0.5;
+  var functionName = Blockly.bash.provideFunction_(
       'colour_blend',
-      ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ +
+      ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ +
           '($c1, $c2, $ratio) {',
        '  $ratio = max(min($ratio, 1), 0);',
        '  $r1 = hexdec(substr($c1, 1, 2));',
@@ -77,5 +77,5 @@ Blockly.smash['colour_blend'] = function(block) {
        '  return $hex;',
        '}']);
   var code = functionName + '(' + c1 + ', ' + c2 + ', ' + ratio + ')';
-  return [code, Blockly.smash.ORDER_FUNCTION_CALL];
+  return [code, Blockly.bash.ORDER_FUNCTION_CALL];
 };
