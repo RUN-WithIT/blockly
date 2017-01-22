@@ -61,37 +61,39 @@ Blockly.smash['math_single'] = function(block) {
   // wrapping the code.
   switch (operator) {
     case 'ABS':
-      code = 'abs(' + arg + ')';
+      code = '`[ $1 -lt 0 ] && echo $((- ' + arg + ')) || echo ' + arg + '`';
       break;
     case 'ROOT':
-      code = 'sqrt(' + arg + ')';
+      code = '`echo "sqrt(' + arg + ')" | bc -l`';
       break;
     case 'LN':
-      code = 'log(' + arg + ')';
+      code = '`echo "l(' + arg + ')" | bc -l`';
       break;
     case 'EXP':
-      code = 'exp(' + arg + ')';
+      code = '`echo "e(' + arg + ')" | bc -l`';
       break;
     case 'POW10':
-      code = 'pow(10,' + arg + ')';
+      code = '` echo "10^' + arg + '" | bc -l`';
       break;
     case 'ROUND':
-      code = 'round(' + arg + ')';
+      code = '`printf -v int %.0f "' + arg + '"`';
       break;
     case 'ROUNDUP':
-      code = 'ceil(' + arg + ')';
+      arg = Blockly.smash.strip$(arg);
+      code = '${' + arg + '/.*}';
       break;
     case 'ROUNDDOWN':
-      code = 'floor(' + arg + ')';
+      arg = Blockly.smash.strip$(arg);
+      code = '$((${' + arg + '/.*} + 1)) ';
       break;
     case 'SIN':
-      code = 'sin(' + arg + ' / 180 * pi())';
+      code = '`echo "s(' + arg + ')" | bc -l`';
       break;
     case 'COS':
-      code = 'cos(' + arg + ' / 180 * pi())';
+      code = '`echo "c(' + arg + ')" | bc -l`';
       break;
     case 'TAN':
-      code = 'tan(' + arg + ' / 180 * pi())';
+      code = '`echo "s(' + arg + ')/c(' + arg + ')" | bc -l`';
       break;
   }
   if (code) {
@@ -101,16 +103,16 @@ Blockly.smash['math_single'] = function(block) {
   // wrapping the code.
   switch (operator) {
     case 'LOG10':
-      code = 'log(' + arg + ') / log(10)';
+      code = '`echo "l(' + arg + ') / l(10)" | bc-l`';
       break;
     case 'ASIN':
-      code = 'asin(' + arg + ') / pi() * 180';
+      code = 'asin(' + arg + ') / pi() * 180'; //TODO
       break;
     case 'ACOS':
-      code = 'acos(' + arg + ') / pi() * 180';
+      code = 'acos(' + arg + ') / pi() * 180'; //TODO
       break;
     case 'ATAN':
-      code = 'atan(' + arg + ') / pi() * 180';
+      code = '`echo "a(' + arg + ')" | bc -l`';
       break;
     default:
       throw 'Unknown math operator: ' + operator;
@@ -121,11 +123,11 @@ Blockly.smash['math_single'] = function(block) {
 Blockly.smash['math_constant'] = function(block) {
   // Constants: PI, E, the Golden Ratio, sqrt(2), 1/sqrt(2), INFINITY.
   var CONSTANTS = {
-    'PI': ['`echo "scale=5; 4*a(1)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
-    'E': ['`echo "scale=5; e(1)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
-    'GOLDEN_RATIO': ['`echo "scale=5; (1 + sqrt(5)) / 2" | bc -l`', Blockly.smash.ORDER_DIVISION],
-    'SQRT2': ['`echo "scale=5; sqrt(2)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
-    'SQRT1_2': ['`echo "scale=5; 1/sqrt(2)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
+    'PI': ['`echo "4*a(1)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
+    'E': ['`echo "e(1)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
+    'GOLDEN_RATIO': ['`echo "(1 + sqrt(5)) / 2" | bc -l`', Blockly.smash.ORDER_DIVISION],
+    'SQRT2': ['`echo "sqrt(2)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
+    'SQRT1_2': ['`echo "1/sqrt(2)" | bc -l`', Blockly.smash.ORDER_ATOMIC],
     'INFINITY': ['INF', Blockly.smash.ORDER_ATOMIC]
   };
   return CONSTANTS[block.getFieldValue('CONSTANT')];
@@ -143,21 +145,17 @@ Blockly.smash['math_number_property'] = function(block) {
     var functionName = Blockly.smash.provideFunction_(
         'math_isPrime',
         ['function ' + Blockly.smash.FUNCTION_NAME_PLACEHOLDER_ + '{',
-         '  // https://en.wikipedia.org/wiki/Primality_test#Naive_methods',
          '  if [ "$1" -eq "2" ] ||[ "$1" -eq "3" ] ',
 	 '  then',
          '    echo 1',
 	 '    exit 1',
          '  fi',
-         '  // False if n is NaN, negative, is 1, or not whole.',
-         '  // And false if n is divisible by 2 or 3.',
          '  if [ "$1" =~ ^[0-9]+$ ] || [ "$1" -le "1" ] ||' +
          '  [ "$1" % "1" -ne "0" ] || "$1" % "2" -eq "0" || "$1" % "3" -eq "0"]',
 	 '  then',
          '    echo 0',
 	 '    exit 1',
          '  fi',
-         '  // Check all the numbers of form 6k +/- 1, up to sqrt(n).',
          '  for (($x=6; "$x"<=`echo "sqrt($1)" | bc -q` + 1; $x+=6)); do',
          '    if [ $1 % ($x - 1) -eq  0 ] || [ $1 % ($x + 1) -eq 0 ]; then',
          '      echo 0',
@@ -166,7 +164,7 @@ Blockly.smash['math_number_property'] = function(block) {
          '  done',
          '  echo 0',
          '}']);
-    code = functionName + number_to_check;
+    code = '`' + functionName + ' ' + number_to_check + '`';
     return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
   }
   switch (dropdown_property) {
@@ -191,7 +189,7 @@ Blockly.smash['math_number_property'] = function(block) {
       code = number_to_check + ' % ' + divisor + ' == 0';
       break;
   }
-  return [code, Blockly.smash.ORDER_EQUALITY];
+  return ['[' + code + ']', Blockly.smash.ORDER_EQUALITY];
 };
 
 Blockly.smash['math_change'] = function(block) {
@@ -200,7 +198,7 @@ Blockly.smash['math_change'] = function(block) {
       Blockly.smash.ORDER_ADDITION) || '0';
   var varName = Blockly.smash.variableDB_.getName(
       block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
-  return varName + ' += ' + argument0 + ';\n';
+  return '('varName + ' += ' + argument0 + ')\n';
 };
 
 // Rounding functions have a single operand.
@@ -215,17 +213,17 @@ Blockly.smash['math_on_list'] = function(block) {
   switch (func) {
     case 'SUM':
       list = Blockly.smash.valueToCode(block, 'LIST',
-          Blockly.smash.ORDER_FUNCTION_CALL) || 'array()';
+          Blockly.smash.ORDER_FUNCTION_CALL) || '()';
       code = 'array_sum(' + list + ')';
       break;
     case 'MIN':
       list = Blockly.smash.valueToCode(block, 'LIST',
-          Blockly.smash.ORDER_FUNCTION_CALL) || 'array()';
+          Blockly.smash.ORDER_FUNCTION_CALL) || '()';
       code = 'min(' + list + ')';
       break;
     case 'MAX':
       list = Blockly.smash.valueToCode(block, 'LIST',
-          Blockly.smash.ORDER_FUNCTION_CALL) || 'array()';
+          Blockly.smash.ORDER_FUNCTION_CALL) || '()';
       code = 'max(' + list + ')';
       break;
     case 'AVERAGE':
@@ -236,7 +234,7 @@ Blockly.smash['math_on_list'] = function(block) {
            '  return array_sum($myList) / count($myList);',
            '}']);
       list = Blockly.smash.valueToCode(block, 'LIST',
-          Blockly.smash.ORDER_NONE) || 'array()';
+          Blockly.smash.ORDER_NONE) || '()';
       code = functionName + '(' + list + ')';
       break;
     case 'MEDIAN':
@@ -311,7 +309,7 @@ Blockly.smash['math_modulo'] = function(block) {
       Blockly.smash.ORDER_MODULUS) || '0';
   var argument1 = Blockly.smash.valueToCode(block, 'DIVISOR',
       Blockly.smash.ORDER_MODULUS) || '0';
-  var code = argument0 + ' % ' + argument1;
+  var code = '$(('argument0 + ' % ' + argument1 + '))';
   return [code, Blockly.smash.ORDER_MODULUS];
 };
 
