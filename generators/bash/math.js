@@ -57,11 +57,17 @@ Blockly.bash['math_single'] = function(block) {
     arg = Blockly.bash.valueToCode(block, 'NUM',
         Blockly.bash.ORDER_NONE) || '0';
   }
+
   // First, handle cases which generate values that don't need parentheses
   // wrapping the code.
   switch (operator) {
     case 'ABS':
-      code = '`[ $1 -lt 0 ] && echo $((- ' + arg + ')) || echo ' + arg + '`';
+      var math_abs = Blockly.bash.provideFunction_(
+            'math_abs',
+            ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+                '[ $1 -lt 0 ] && echo $((- $1)) || echo $1',
+             '}']);
+      code = '`' + math_abs + ' ' + arg + '`';
       break;
     case 'ROOT':
       code = '`echo "sqrt(' + arg + ')" | bc -l`';
@@ -103,13 +109,35 @@ Blockly.bash['math_single'] = function(block) {
   // wrapping the code.
   switch (operator) {
     case 'LOG10':
-      code = '`echo "l(' + arg + ') / l(10)" | bc-l`';
+      code = '`echo "l(' + arg + ') / l(10)" | bc -l`';
       break;
     case 'ASIN':
-      code = 'asin(' + arg + ') / pi() * 180'; //TODO
+      var math_asin = Blockly.bash.provideFunction_(
+           'math_asin',
+           ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+               'if (( $(echo "$1 == 1" | bc -l) ));then',
+               '      echo "90"',
+               '   elif (( $(echo "$1 < 1" | bc -l) ));then',
+               '      echo "scale=3;a(sqrt((1/(1-($1^2)))-1))" | bc -l',
+               '   elif (( $(echo "$1 > 1" | bc -l) ));then',
+               '      echo "error"',
+               '   fi',
+            '}']);
+      code = '`' + math_asin + ' ' + arg + '`';
       break;
     case 'ACOS':
-      code = 'acos(' + arg + ') / pi() * 180'; //TODO
+      var math_acos = Blockly.bash.provideFunction_(
+             'math_acos',
+             ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+                  'if (( $(echo "$1 == 0" | bc -l) ));then',
+                  '      echo "90"',
+                  '   elif (( $(echo "$1 <= 1" | bc -l) ));then',
+                  '      echo "scale=3;a(sqrt((1/($1^2))-1))" | bc -l',
+                  '   elif (( $(echo "$1 > 1" | bc -l) ));then',
+                  '      echo "error"',
+                  'fi',
+              '}']);
+      code = '`' + math_acos + ' ' + arg + '`';
       break;
     case 'ATAN':
       code = '`echo "a(' + arg + ')" | bc -l`';
@@ -146,20 +174,20 @@ Blockly.bash['math_number_property'] = function(block) {
         'math_isPrime',
         ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + '{',
          '  if [ "$1" -eq "2" ] ||[ "$1" -eq "3" ] ',
-	 '  then',
+	     '  then',
          '    echo 1',
-	 '    exit 1',
+	     '    exit 1',
          '  fi',
          '  if [ "$1" =~ ^[0-9]+$ ] || [ "$1" -le "1" ] ||' +
          '  [ "$1" % "1" -ne "0" ] || "$1" % "2" -eq "0" || "$1" % "3" -eq "0"]',
-	 '  then',
+	     '  then',
          '    echo 0',
-	 '    exit 1',
+	     '    exit 1',
          '  fi',
          '  for (($x=6; "$x"<=`echo "sqrt($1)" | bc -q` + 1; $x+=6)); do',
          '    if [ $1 % ($x - 1) -eq  0 ] || [ $1 % ($x + 1) -eq 0 ]; then',
          '      echo 0',
-	 '      exit 1',
+	     '      exit 1',
          '    fi',
          '  done',
          '  echo 0',
@@ -214,24 +242,69 @@ Blockly.bash['math_on_list'] = function(block) {
     case 'SUM':
       list = Blockly.bash.valueToCode(block, 'LIST',
           Blockly.bash.ORDER_FUNCTION_CALL) || '()';
-      code = 'array_sum(' + list + ')';
+      list = Blockly.smash.strip$(list);
+
+      var math_sum_list = Blockly.bash.provideFunction_(
+             'math_sum_list',
+             ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+                 'local _name="$1[@]"',
+                 'local _l=("${!_name}")',
+                 'local a=0',
+                 'for i in ${_l[@]}; do',
+                 '   ((a+=i))',
+                 'done',
+                 'echo $a',
+              '}']);
+      code = '`' + math_sum_list + ' ' + list + '`';
       break;
     case 'MIN':
       list = Blockly.bash.valueToCode(block, 'LIST',
           Blockly.bash.ORDER_FUNCTION_CALL) || '()';
-      code = 'min(' + list + ')';
+      list = Blockly.smash.strip$(list);
+
+      var math_min_list = Blockly.bash.provideFunction_(
+           'math_min_list',
+           ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+               'local _name="$1[@]"',
+               'local _l=("${!_name}")',
+               'local min=${_l[0]}',
+               'for i in ${_l[@]}; do',
+               '   if [[ $i -lt $min ]]; then',
+               '        min=$i',
+               '   fi',
+               'done',
+               'echo ${min}',
+            '}']);
+      code = '`' + math_min_list + ' ' + list + '`';
       break;
     case 'MAX':
       list = Blockly.bash.valueToCode(block, 'LIST',
           Blockly.bash.ORDER_FUNCTION_CALL) || '()';
-      code = 'max(' + list + ')';
+      list = Blockly.smash.strip$(list);
+
+      var math_min_list = Blockly.bash.provideFunction_(
+             'math_max_list',
+             ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+                 'local _name="$1[@]"',
+                 'local _l=("${!_name}")',
+                 'local max=${_l[0]}',
+                 'for i in ${_l[@]}; do',
+                 '   if [[ $i -lg $max ]]; then',
+                 '        max=$i',
+                 '   fi',
+                 'done',
+                 'echo ${max}',
+              '}']);
+      code = '`' + math_max_list + ' ' + list + '`';
       break;
     case 'AVERAGE':
       var functionName = Blockly.bash.provideFunction_(
           'math_mean',
-          ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ +
-              '($myList) {',
-           '  return array_sum($myList) / count($myList);',
+          ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+           '  local _name="$1[@]"',
+           '  local _l=("${!_name}")',
+           '  local sum=`array_sum $_name`',
+           '  echo  `echo "$sum / ${#_l[@]}" | bc -l`',
            '}']);
       list = Blockly.bash.valueToCode(block, 'LIST',
           Blockly.bash.ORDER_NONE) || '()';
