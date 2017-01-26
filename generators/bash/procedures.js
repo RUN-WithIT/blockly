@@ -51,7 +51,7 @@ Blockly.bash['procedures_callreturn'] = function(block) {
     args[i] = Blockly.bash.valueToCode(block, 'ARG' + i,
         Blockly.bash.ORDER_COMMA) || 'null';
   }
-  var code = '`' + funcName + args.join(' ') + '`';
+  var code = '`' + funcName + ' ' + args.join(' ') + '`';
   return [code, Blockly.bash.ORDER_FUNCTION_CALL];
 };
 
@@ -64,7 +64,7 @@ Blockly.bash['procedures_callnoreturn'] = function(block) {
     args[i] = Blockly.bash.valueToCode(block, 'ARG' + i,
         Blockly.bash.ORDER_COMMA) || '';
   }
-  var code = funcName +  args.join(' ') + '\n';
+  var code = funcName + ' ' +  args.join(' ') + '\n';
   return code;
 };
 
