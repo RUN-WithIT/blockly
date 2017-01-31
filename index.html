@@ -10,6 +10,7 @@
   <script src="dart_compressed.js"></script>
   <script src="bash_compressed.js"></script>
   <script src="demos/prettify.js"></script>
+  <script src="smash_blocks/predefine_functions.js"></script>
   <script src="appengine/storage.js"></script>
   <script src="demos/interpreter/acorn_interpreter.js"></script>
   <link href="demos/prettify.css" rel="stylesheet">
@@ -49,6 +50,12 @@
       <block type="logic_null"></block>
       <block type="logic_ternary"></block>
     </category>
+
+  <category id="predef_fun" colour="230" name="Predefined Functions">
+    <block type="predefined_procedures">
+      <field name="NAME">Function name</field>
+    </block>
+  </category>
     <category id="catLoops" colour="120" name="Loops">
       <block type="controls_repeat_ext">
         <value name="TIMES">
