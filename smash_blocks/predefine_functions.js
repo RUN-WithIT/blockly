@@ -119,6 +119,35 @@ Blockly.Blocks['predefined_procedures'] = {
   }
 };
 
+Blockly.Blocks['predefined_procedures_noreturn'] = {
+  /**
+   * Block for calling a predefine functionw with any name and any number of arguments.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(230);
+    this.itemCount_ = 1;
+
+    this.setInputsInline(true);
+    this.appendDummyInput()
+                  .appendField(new Blockly.FieldTextInput("Function_name"), "NAME");
+    this.updateShape_();
+    this.setOutput(false);
+    this.setMutator(new Blockly.Mutator(['predefined_procedures_with_params']));
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+  },
+
+  mutationToDom: Blockly.Blocks['predefined_procedures'].mutationToDom,
+  domToMutation: Blockly.Blocks['predefined_procedures'].domToMutation,
+  decompose: Blockly.Blocks['predefined_procedures'].decompose,
+  compose: Blockly.Blocks['predefined_procedures'].compose,
+  saveConnections: Blockly.Blocks['predefined_procedures'].saveConnections,
+  updateShape_: Blockly.Blocks['predefined_procedures'].updateShape_
+};
+
+
+
 Blockly.Blocks['predefined_procedures_with_container'] = {
   /**
    * Mutator block for list container.

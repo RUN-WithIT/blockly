@@ -15,7 +15,7 @@ Blockly.bash['variables_get'] = function(block) {
 Blockly.bash['variables_set'] = function(block) {
     // Variable setter.
     var argument0 = Blockly.bash.valueToCode(block, 'VALUE',
-            Blockly.bash.ORDER_ASSIGNMENT) || '0';
+            Blockly.bash.ORDER_ASSIGNMENT) || '""';
     var varName = Blockly.bash.variableDB_.getName(
         block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
     return varName + '=' + argument0 + '\n';

@@ -125,13 +125,6 @@ Blockly.bash.init = function(workspace) {
     Blockly.bash.variableDB_.reset();
   }
 
-  var defvars = [];
-  var variables = Blockly.Variables.allVariables(workspace);
-  for (var i = 0; i < variables.length; i++) {
-    defvars[i] = Blockly.bash.variableDB_.getName(variables[i],
-        Blockly.Variables.NAME_TYPE) + '=""';
-  }
-  Blockly.bash.definitions_['variables'] = defvars.join('\n');
 };
 
 /**
