@@ -314,15 +314,11 @@ Blockly.bash['math_on_list'] = function(block) {
       var functionName = Blockly.bash.provideFunction_(
           'math_median',
           ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ +
-              '($arr) {',
-           '  sort($arr,SORT_NUMERIC);',
-           '  return (count($arr) % 2) ? $arr[floor(count($arr)/2)] : ',
-           '      ($arr[floor(count($arr)/2)] + $arr[floor(count($arr)/2)' +
-              ' - 1]) / 2;',
+
            '}']);
       list = Blockly.bash.valueToCode(block, 'LIST',
           Blockly.bash.ORDER_NONE) || '[]';
-      code = functionName + '(' + list + ')';
+      code = functionName + ' ' + list;
       break;
     case 'MODE':
       // As a list of numbers can contain more than one mode,
@@ -330,29 +326,18 @@ Blockly.bash['math_on_list'] = function(block) {
       // Mode of [3, 'x', 'x', 1, 1, 2, '3'] -> ['x', 1].
       var functionName = Blockly.bash.provideFunction_(
           'math_modes',
-          ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ +
-              '($values) {',
-           '  if (empty($values)) return array();',
-           '  $counts = array_count_values($values);',
-           '  arsort($counts); // Sort counts in descending order',
-           '  $modes = array_keys($counts, current($counts), true);',
-           '  return $modes;',
+          ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {'
+
            '}']);
       list = Blockly.bash.valueToCode(block, 'LIST',
           Blockly.bash.ORDER_NONE) || '[]';
-      code = functionName + '(' + list + ')';
+      code = functionName + ' ' + list;
       break;
     case 'STD_DEV':
       var functionName = Blockly.bash.provideFunction_(
           'math_standard_deviation',
-          ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ +
-              '($numbers) {',
-           '  $n = count($numbers);',
-           '  if (!$n) return null;',
-           '  $mean = array_sum($numbers) / count($numbers);',
-           '  foreach($numbers as $key => $num) $devs[$key] = ' +
-              'pow($num - $mean, 2);',
-           '  return sqrt(array_sum($devs) / (count($devs) - 1));',
+          ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+
            '}']);
       list = Blockly.bash.valueToCode(block, 'LIST',
               Blockly.bash.ORDER_NONE) || '[]';
@@ -361,14 +346,12 @@ Blockly.bash['math_on_list'] = function(block) {
     case 'RANDOM':
       var functionName = Blockly.bash.provideFunction_(
           'math_random_list',
-          ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ +
-              '($list) {',
-           '  $x = rand(0, count($list)-1);',
-           '  return $list[$x];',
+          ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+
            '}']);
       list = Blockly.bash.valueToCode(block, 'LIST',
           Blockly.bash.ORDER_NONE) || '[]';
-      code = functionName + '(' + list + ')';
+      code = functionName + ' ' + list;
       break;
     default:
       throw 'Unknown operator: ' + func;
@@ -394,8 +377,9 @@ Blockly.bash['math_constrain'] = function(block) {
       Blockly.bash.ORDER_COMMA) || '0';
   var argument2 = Blockly.bash.valueToCode(block, 'HIGH',
       Blockly.bash.ORDER_COMMA) || 'Infinity';
-  var code = 'min(max(' + argument0 + ', ' + argument1 + '), ' +
-      argument2 + ')';
+
+
+  var code = ''
   return [code, Blockly.bash.ORDER_FUNCTION_CALL];
 };
 
@@ -405,20 +389,13 @@ Blockly.bash['math_random_int'] = function(block) {
       Blockly.bash.ORDER_COMMA) || '0';
   var argument1 = Blockly.bash.valueToCode(block, 'TO',
       Blockly.bash.ORDER_COMMA) || '0';
-  var functionName = Blockly.bash.provideFunction_(
-      'math_random_int',
-      ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ +
-          '($a, $b) {',
-       '  if ($a > $b) {',
-       '    return rand($b, $a);',
-       '  }',
-       '  return rand($a, $b);',
-       '}']);
-  var code = functionName + '(' + argument0 + ', ' + argument1 + ')';
+
+  var code = '$(((' + argument0 + ' + $RANDOM) % ' + argument1 + '))'
+
   return [code, Blockly.bash.ORDER_FUNCTION_CALL];
 };
 
 Blockly.bash['math_random_float'] = function(block) {
   // Random fraction between 0 and 1.
-  return ['(float)rand()/(float)getrandmax()', Blockly.bash.ORDER_FUNCTION_CALL];
+  return ['`awk -v "seed=$RANDOM"  \'BEGIN { srand(seed); printf("%.5f\n", rand()) }\'`', Blockly.bash.ORDER_FUNCTION_CALL];
 };
