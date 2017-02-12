@@ -347,10 +347,14 @@ Blockly.bash['math_on_list'] = function(block) {
       var functionName = Blockly.bash.provideFunction_(
           'math_random_list',
           ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
-
+           '  local _name="$1[@]"',
+           '  local _l=("${!_name}")',
+           '  local i=$(($RANDOM % ${#_l[@]}))',
+           '  echo "${_l[$i]}"',
+           '  eval "$1=(\\"\\${_l[@]}\\")"',
            '}']);
       list = Blockly.bash.valueToCode(block, 'LIST',
-          Blockly.bash.ORDER_NONE) || '[]';
+          Blockly.bash.ORDER_NONE) || '()';
       code = functionName + ' ' + list;
       break;
     default:
@@ -380,9 +384,9 @@ Blockly.bash['math_constrain'] = function(block) {
 
  var functionName = Blockly.bash.provideFunction_(
        'mathContrain',
-       ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + '{',
-        '  max=$((' + argument0 + '>' + argument1 + '?' + argument0 + ':' + argument1+ '))',
-        '  val=$((max<' + argument2 + '?max:' + argument2 + '))',
+       ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+        '  max=$((${1}>${2}?${1}:${2}))',
+        '  val=$(($max<${3}?$max:${3}))',
         '  echo $val',
         '}'
       ]);
