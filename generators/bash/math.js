@@ -308,7 +308,7 @@ Blockly.bash['math_on_list'] = function(block) {
            '}']);
       list = Blockly.bash.valueToCode(block, 'LIST',
           Blockly.bash.ORDER_NONE) || '()';
-      code = functionName + '(' + list + ')';
+      code = '`' + functionName + ' ' + list + '`';
       break;
     case 'MEDIAN':
       var functionName = Blockly.bash.provideFunction_(
@@ -326,7 +326,7 @@ Blockly.bash['math_on_list'] = function(block) {
       // Mode of [3, 'x', 'x', 1, 1, 2, '3'] -> ['x', 1].
       var functionName = Blockly.bash.provideFunction_(
           'math_modes',
-          ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {'
+          ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
 
            '}']);
       list = Blockly.bash.valueToCode(block, 'LIST',
@@ -378,8 +378,15 @@ Blockly.bash['math_constrain'] = function(block) {
   var argument2 = Blockly.bash.valueToCode(block, 'HIGH',
       Blockly.bash.ORDER_COMMA) || 'Infinity';
 
-
-  var code = ''
+ var functionName = Blockly.bash.provideFunction_(
+       'mathContrain',
+       ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + '{',
+        '  max=$((' + argument0 + '>' + argument1 + '?' + argument0 + ':' + argument1+ '))',
+        '  val=$((max<' + argument2 + '?max:' + argument2 + '))',
+        '  echo $val',
+        '}'
+      ]);
+  var code = '`' + functionName + ' ' + argument0 + ' ' + argument1 + ' ' + argument2 + '`';
   return [code, Blockly.bash.ORDER_FUNCTION_CALL];
 };
 
