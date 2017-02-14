@@ -12,14 +12,8 @@ Blockly.bash['colour_picker'] = function(block) {
 };
 
 Blockly.bash['colour_random'] = function(block) {
-  // Generate a random colour.
-  var functionName = Blockly.bash.provideFunction_(
-      'colour_random',
-      ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + '() {',
-       '  return \'#\' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), ' +
-          '6, \'0\', STR_PAD_LEFT);',
-       '}']);
-  var code = functionName + '()';
+   //if this breaks add LC_CTYPE=C
+  var code = `cat /dev/urandom | tr -dc 'A-F0-9' | fold -w 6 | head -n 1`
   return [code, Blockly.bash.ORDER_FUNCTION_CALL];
 };
 
@@ -33,16 +27,17 @@ Blockly.bash['colour_rgb'] = function(block) {
       Blockly.bash.ORDER_COMMA) || 0;
   var functionName = Blockly.bash.provideFunction_(
       'colour_rgb',
-      ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ +
-          '($r, $g, $b) {',
-       '  $r = round(max(min($r, 100), 0) * 2.55);',
-       '  $g = round(max(min($g, 100), 0) * 2.55);',
-       '  $b = round(max(min($b, 100), 0) * 2.55);',
-       '  $hex = \'#\';',
-       '  $hex .= str_pad(dechex($r), 2, \'0\', STR_PAD_LEFT);',
-       '  $hex .= str_pad(dechex($g), 2, \'0\', STR_PAD_LEFT);',
-       '  $hex .= str_pad(dechex($b), 2, \'0\', STR_PAD_LEFT);',
-       '  return $hex;',
+      ['function ' + Blockly.bash.FUNCTION_NAME_PLACEHOLDER_ + ' {',
+       '  r=`mathContrain $1 0 100`',
+       '  g=`mathContrain $2 0 100`',
+       '  b=`mathContrain $3 0 100`',
+       '  r=`echo "$r * 2.55" | bc `',
+       '  g=`echo "$g * 2.55" | bc `',
+       '  b=`echo "$b * 2.55" | bc `',
+       '  r=`printf "%02x\\n" ${r/.*}`',
+       '  g=`printf "%02x\\n" ${g/.*}`',
+       '  b=`printf "%02x\\n" ${b/.*}`',
+       '  echo "#${r}${g}${b}"',
        '}']);
   var code = functionName + '(' + red + ', ' + green + ', ' + blue + ')';
   return [code, Blockly.bash.ORDER_FUNCTION_CALL];
