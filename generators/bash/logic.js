@@ -10,13 +10,19 @@ Blockly.bash['controls_if'] = function(block) {
   var n = 0;
   var argument = Blockly.bash.valueToCode(block, 'IF' + n,
       Blockly.bash.ORDER_NONE) || '';
+
+  if (argument.indexOf('[') === -1 || argument.indexOf(']') === -1) {
+    argument = '[ ' + argument + ' ]';
+  }
+
+
   var branch = Blockly.bash.statementToCode(block, 'DO' + n);
-  var code = 'if [ ' + argument + ' ] ; then \n' + branch;
+  var code = 'if ' + argument + ' ; then \n' + branch;
   for (n = 1; n <= block.elseifCount_; n++) {
     argument = Blockly.bash.valueToCode(block, 'IF' + n,
         Blockly.bash.ORDER_NONE) || '';
     branch = Blockly.bash.statementToCode(block, 'DO' + n);
-    code += ' elif [ ' + argument + ' ] ; then\n' + branch;
+    code += ' elif ' + argument + ' ; then\n' + branch;
   }
   if (block.elseCount_) {
     branch = Blockly.bash.statementToCode(block, 'ELSE');
@@ -72,7 +78,7 @@ Blockly.bash['logic_compare'] = function(block) {
     Blockly.bash.ORDER_EQUALITY : Blockly.bash.ORDER_RELATIONAL;
 
 
-    var code = argument0  + ' ' + operator + ' ' + argument1;
+    var code = '[ ' + argument0  + ' ' + operator + ' ' + argument1 + ' ]';
     return [code, order];
 
 };
